@@ -1888,7 +1888,10 @@ function copyOverLimitTextR() {
         let line = uniToEng(rawLine.toLowerCase());
         
         // 🔥 [ဒီနေရာမှာ အရင်ဆုံး ထားရပါမယ်] 'ည' မဖျက်ခင် bro အရင်ပြောင်းပါ 🔥
+        line = line.replace(/(\d+)\s*ခွေ\s*(\d+)\s*(?:အ)?ပူး(?:ပါ)?/g, '$1 kp $2');
+        line = line.replace(/kအပူးပါ|အပူးပါခွေ|ခွေအပူးပါ|ခွေp|ခွေa|ခွေပူး|ခပ|ka/g, 'kp'); 
         line = line.replace(/ညီအစ်ကို|ညီအကို|ညီကို|ညက|bro|br/g, 'bro');
+        line = line.replace(/ပါဝါ|ပဝ|power/g, 'pw');
         line = line.replace(/အပါ|ပတ်သီး|ပါတ်|ပတ်|ပါ/g, 'p');
 
         // ပြီးမှ အောက်က ဟာတွေ ဆက်လုပ်ပါ
@@ -1903,14 +1906,13 @@ function copyOverLimitTextR() {
 
         // 🛑 [အရေးကြီး] စကားလုံးအရှည်တွေကို အရင် Replace လုပ်ပါ 🛑
         line = line.replace(/နတ္ခတ်|နက္ခတ်|နခ|နတ်ခက်|နက်ခတ်|နက်ခက်|နတ်ခတ်/g, 'nk');
-        line = line.replace(/ပါဝါ|ပဝ|power/g, 'pw');
+
         // (bro လိုင်းကို အပေါ်တင်လိုက်ပြီဖြစ်လို့ ဒီနေရာမှာ မရှိတော့ပါ)
         line = line.replace(/စုံထိပ်|စထ/g, 'sh')
               .replace(/မထိပ်|မထ/g, 'mh')
               .replace(/စုံနောက်|စန/g, 'st')
-              .replace(/မနောက်|မန/g, 'mt');
-              
-        line = line.replace(/kအပူးပါ|အပူးပါခွေ|ခွေအပူးပါ|ခွေp|ခွေa|ခွေပူး|ခပ|ka/g, 'kp').replace(/အပူး၁၀ကွက်|အပူး10ကွက်|အပူး|အပ|ပူး/g, 'ap')
+              .replace(/မနောက်|မန/g, 'mt')
+              .replace(/အပူး၁၀ကွက်|အပူး10ကွက်|အပူး|အပ|ပူး/g, 'ap')
              .replace(/ဒဲ့ကပ်|ကပ်/g, 'dk')
              .replace(/ထိပ်စီး|ထိပ်|ထ/g, 'h');
 
