@@ -2137,17 +2137,29 @@ function copyOverLimitTextR() {
             if (MM_MAP[cmd]) { cmd = MM_MAP[cmd]; }
             let amt = 0; 
             if (i + 1 < parts.length && /^\d+$/.test(parts[i+1])) { amt = parseInt(parts[i+1]); i += 2; } else { i++; }
-            if (['h', 't', 'n', 'p', 'k', 'b', 'kp', 'ht', 'th', 'dk', 'ထိပ်', 'နောက်', 'ထိပ်နောက်', 'ဒဲ့ကပ်', 'ခွေ', 'ပတ်'].includes(cmd)) {
+                        if (['h', 't', 'n', 'p', 'k', 'b', 'kp', 'ht', 'th', 'dk', 'ထိပ်', 'နောက်', 'ထိပ်နောက်', 'ဒဲ့ကပ်', 'ခွေ', 'ပတ်'].includes(cmd)) {
                  if (globalNums.length > 0 && amt > 0) {
+                    
+                    // 🔥 ဤနေရာတွင် ထည့်ပါ (ကုဒ်အဟောင်းများ မပျက်စေဘဲ ဤနေရာကနေ စစ်ပေးပါမည်)
+                    if (['k', 'kp', 'ခွေ'].includes(cmd)) {
+                        let hasDuplicate = globalNums.some((val, idx, arr) => arr.indexOf(val) !== idx);
+                        if (hasDuplicate) {
+                            alert("⚠️ အမှား: ထည့်သွင်းထားသော ခွေဂဏန်းထဲတွင် ဂဏန်းနှစ်ခါထပ်နေပါသည် (ဥပမာ - " + globalNums.join('') + ")။ ဤစာရင်းကို ထည့်သွင်း၍မရပါ။");
+                            return; 
+                        }
+                    }
+                    // -------------------------------------------------------------
+
                     if (cmd === 'h' || cmd === 'ထိပ်') globalNums.forEach(n => AL.forEach(x => addMatch(n + x, amt)));
                     else if (cmd === 't' || cmd === 'n' || cmd === 'နောက်') globalNums.forEach(n => AL.forEach(x => addMatch(x + n, amt)));
-                    else if (cmd === 'ht' || cmd === 'th' || cmd === 'ထိပ်နောက်') globalNums.forEach(n => { AL.forEach(x => addMatch(n + x, amt)); AL.forEach(x => addMatch(x + n, amt)); });
+                    else if (cmd === 'ht' || cmd === 'th' || cmd === 'ထိပ်နောက်') globalNums.forEach(n => { AL.forEach(x => addMatch(x + n, amt)); AL.forEach(x => addMatch(x + n, amt)); });
                     else if (cmd === 'p' || cmd === 'ပတ်') globalNums.forEach(n => AL.forEach(x => { addMatch(n + x, amt); if (n !== x) addMatch(x + n, amt); }));
                     else if (cmd === 'k' || cmd === 'kp' || cmd === 'ခွေ') { for (let a = 0; a < globalNums.length; a++) { for (let b = 0; b < globalNums.length; b++) { if (a === b) continue; addMatch(globalNums[a] + globalNums[b], amt); } } if (cmd === 'kp') globalNums.forEach(d => addMatch(d + d, amt)); } 
                     else if (cmd === 'dk' || cmd === 'ဒဲ့ကပ်') { for (let a = 0; a < globalNums.length; a++) { for (let b = a + 1; b < globalNums.length; b++) { addMatch(globalNums[a] + globalNums[b], amt); } } }
                     else if (cmd === 'b') { globalNums.forEach(b => { for(let x=0; x<100; x++) { let nStr = x.toString().padStart(2, '0'); if ((parseInt(nStr[0]) + parseInt(nStr[1])) % 10 == parseInt(b)) addMatch(nStr, amt); } }); }
                 }
             }
+
             else if (amt > 0) {
                 if (SHORTCUT_LISTS[cmd]) { SHORTCUT_LISTS[cmd].forEach(n => addMatch(n, amt)); }
                 else if (cmd === 'mm') AL.forEach(a => AL.forEach(b => ["1","3","5","7","9"].includes(a) && ["1","3","5","7","9"].includes(b) && addMatch(a+b, amt)));
