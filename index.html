@@ -1913,8 +1913,8 @@ function copyOverLimitTextR() {
               .replace(/စုံနောက်|စန/g, 'st')
               .replace(/မနောက်|မန/g, 'mt')
               .replace(/အပူး၁၀ကွက်|အပူး10ကွက်|အပူး|အပ|ပူး/g, 'ap')
-             .replace(/ဒဲ့ကပ်|ကပ်/g, 'dk')
-             .replace(/ထိပ်စီး|ထိပ်|ထ/g, 'h');
+              .replace(/ဒဲ့ကပ်|ကပ်/g, 'dk')
+              .replace(/ထိပ်စီး|ထိပ်|ထ/g, 'h');
 
         // 🛑 ပြီးမှ စာလုံးအတိုတွေကို နောက်မှ Replace လုပ်ပါ 🛑
         line = line.replace(/ခွေ\s*(.*?)\s*အပူး(?:ပါ)?/g, 'kp $1');
@@ -1957,11 +1957,32 @@ function copyOverLimitTextR() {
         let id = Date.now() + Math.random(); 
         let matches = [];
         
-        // (၁) ထိပ် + နောက် / ထိပ် + R တွဲလျက်ပုံစံ
-        let htMatch = trim.match(/^(\d+)\s*h\s*(\d+)\s*(?:t|n)\s*(\d+)$/i);
+                        // (၁) ထိပ် + နောက် / ထိပ် + R (သို့) Single HT တွဲလျက်ပုံစံများ (ပမာဏပေါင်းစပ်ခြင်း Logic ပါဝင်သည်)
+        let singleHtMatch = trim.match(/^(\d+)\s*(?:ht|th|ထိပ်နောက်)\s*(\d+)$/i);
+        let htMatch = trim.match(/^(\d+)\s*h\s*(\d+)\s*(?:t|n|နောက်)\s*(\d+)$/i);
         let hrMatch = trim.match(/^(\d+)\s*h\s*(\d+)\s*r\s*(\d+)$/i);
 
-        if (htMatch || hrMatch) {
+        if (singleHtMatch) {
+            let digitStr = singleHtMatch[1];
+            let amt = parseInt(singleHtMatch[2]);
+            let digits = digitStr.split('');
+            
+            digits.forEach(d => {
+                for (let i = 0; i < 100; i++) {
+                    let numStr = i.toString().padStart(2, '0');
+                    let isHead = numStr.startsWith(d);
+                    let isRear = numStr.endsWith(d);
+                    
+                    if (isHead && isRear) {
+                        // အပူးဂဏန်း (ဥပမာ 11) ဖြစ်ပြီး ထိပ်ရောနောက်ပါ တစ်ခါတည်းပိုင်ရင် ပမာဏ ၂ ဆ (သို့) တိုက်ရိုက်ပေါင်းထည့်ရန်
+                        matches.push({ num: numStr, amt: amt * 2 });
+                    } else if (isHead || isRear) {
+                        matches.push({ num: numStr, amt: amt });
+                    }
+                }
+            });
+        }
+        else if (htMatch || hrMatch) {
             let match = htMatch || hrMatch;
             let digitStr = match[1];       
             let hAmt = parseInt(match[2]);  
@@ -1974,11 +1995,18 @@ function copyOverLimitTextR() {
                     let isHead = numStr.startsWith(d); 
                     let isRear = numStr.endsWith(d);    
                     
-                    if (isHead) matches.push({ num: numStr, amt: hAmt });
-                    if (isRear) matches.push({ num: numStr, amt: secondAmt });
+                    if (isHead && isRear) {
+                        // ထိပ်ရော နောက်ပါ တစ်ပြိုင်နက်တူညီနေသည့် အပူးကွက်များအတွက် ပမာဏ ၂ ခု ပေါင်းထည့်မည်
+                        matches.push({ num: numStr, amt: hAmt + secondAmt });
+                    } else {
+                        if (isHead) matches.push({ num: numStr, amt: hAmt });
+                        if (isRear) matches.push({ num: numStr, amt: secondAmt });
+                    }
                 }
             });
-        } 
+        }
+
+
         else { 
             let dkMatch = trim.match(/^(\d+)\s*dk\s*(\d+)\s*[\s,]+(\d+)(?:\s*(?:r|အာ)\s*(\d+))?/i);
             if (dkMatch) {
