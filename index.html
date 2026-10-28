@@ -1812,67 +1812,129 @@ function copyOverLimitTextR() {
     alert("✅ အတင်စာရင်း (R ပုံစံ) Copy ကူးပြီးပါပြီ!");
 }
 
-  function copySplitOverLimitText() {
+    function copySplitOverLimitText() {
     let { exportData, currentSort } = getExportDataList();
     
-    if(exportData.length > 0) {
-        let part1Lines = [];
-        let part2Lines = [];
-        let total1 = 0;
-        let total2 = 0;
+    if (exportData.length === 0) {
+        alert("⚠️ အတင်မရှိပါ (No Export)");
+        return;
+    }
+
+    let amtMap = {};
+    let total1 = 0;
+    let total2 = 0;
+    let unevenSplitCounter = 0;
+
+    // (၁) ဂဏန်းတစ်ခုချင်းစီကို ၂ ပိုင်းခွဲ၍ Map ထဲသို့ ထည့်ခြင်း
+    exportData.forEach(item => {
+        let fullAmt = item.amt;
+        let splitAmt = Math.floor(fullAmt / 2);
+        let rem = fullAmt % 2; 
+        let amt1, amt2;
         
-        let unevenSplitCounter = 0;
-        exportData.forEach(item => {
-            let fullAmt = item.amt;
-            let splitAmt = Math.floor(fullAmt / 2);
-            let rem = fullAmt % 2; 
-            let amt1, amt2;
-            
-            if (rem === 0) { 
-                if (splitAmt % 50 !== 0) { 
-                    let floorVal = Math.floor(splitAmt / 50) * 50; 
-                    let ceilVal = Math.ceil(splitAmt / 50) * 50;   
-                    if (unevenSplitCounter % 2 === 0) {
-                        amt1 = ceilVal;
-                        amt2 = floorVal;
-                    } else {
-                        amt1 = floorVal;
-                        amt2 = ceilVal;
-                    }
-                    unevenSplitCounter++; 
-                } else {
-                    amt1 = splitAmt;
-                    amt2 = splitAmt;
-                }
-            } else { 
+        if (rem === 0) { 
+            if (splitAmt % 50 !== 0) { 
+                let floorVal = Math.floor(splitAmt / 50) * 50; 
+                let ceilVal = Math.ceil(splitAmt / 50) * 50;   
                 if (unevenSplitCounter % 2 === 0) {
-                    amt1 = splitAmt + rem;
-                    amt2 = splitAmt;
+                    amt1 = ceilVal;
+                    amt2 = floorVal;
                 } else {
-                    amt1 = splitAmt;
-                    amt2 = splitAmt + rem;
+                    amt1 = floorVal;
+                    amt2 = ceilVal;
                 }
                 unevenSplitCounter++; 
+            } else {
+                amt1 = splitAmt;
+                amt2 = splitAmt;
             }
-            
-            part1Lines.push(`${item.num}-${amt1}`);
-            part2Lines.push(`${item.num}-${amt2}`);
-            total1 += amt1;
-            total2 += amt2;
-        });
+        } else { 
+            if (unevenSplitCounter % 2 === 0) {
+                amt1 = splitAmt + rem;
+                amt2 = splitAmt;
+            } else {
+                amt1 = splitAmt;
+                amt2 = splitAmt + rem;
+            }
+            unevenSplitCounter++; 
+        }
+
+        // ကွက်တစ်ခုချင်းစီအတွက် အပိုင်း (၁) နှင့် (၂) တန်ဖိုးများကို သိမ်းဆည်းရန်
+        if (!amtMap[item.num]) {
+            amtMap[item.num] = { p1: 0, p2: 0 };
+        }
+        amtMap[item.num].p1 += amt1;
+        amtMap[item.num].p2 += amt2;
         
-        let finalText = "--- အပိုင်း (၁) ---\n" + part1Lines.join('\n') + 
-                        `\n----------\nTotal: ${total1.toLocaleString()}\n\n` +
-                        "--- အပိုင်း (၂) ---\n" + part2Lines.join('\n') + 
-                        `\n----------\nTotal: ${total2.toLocaleString()}`;
-        
-        copyToClipboard(finalText);
-        let sortMsg = (currentSort === 'max') ? " (Max Sort)" : (currentSort === 'min' ? " (Min Sort)" : "");
-        alert("✅ အတင်စာရင်းကို (၂) ပိုင်း အညီအမျှခွဲ၍" + sortMsg + " Copy ကူးပြီးပါပြီ!");
-    } else {
-        alert("⚠️ အတင်မရှိပါ (No Export)");
-    }
+        total1 += amt1;
+        total2 += amt2;
+    });
+
+    // (၂) အပိုင်း (၁) ကို R ပုံစံသို့ ပြောင်းလဲခြင်း
+    let processed1 = new Set();
+    let lines1 = [];
+    let sortedNums = Object.keys(amtMap).sort();
+
+    sortedNums.forEach(num => {
+        if (processed1.has(num)) return;
+        let a1 = amtMap[num].p1;
+        let rev = num[1] + num[0];
+
+        if (num === rev) {
+            lines1.push(`${num}-${a1}`);
+            processed1.add(num);
+        } else if (amtMap.hasOwnProperty(rev)) {
+            let a2 = amtMap[rev].p1;
+            if (a1 === a2) {
+                lines1.push(`${num} r ${a1}`);
+            } else {
+                lines1.push(`${num}-${a1} R ${a2}`);
+            }
+            processed1.add(num);
+            processed1.add(rev);
+        } else {
+            lines1.push(`${num}-${a1}`);
+            processed1.add(num);
+        }
+    });
+
+    // (၃) အပိုင်း (၂) ကို R ပုံစံသို့ ပြောင်းလဲခြင်း
+    let processed2 = new Set();
+    let lines2 = [];
+
+    sortedNums.forEach(num => {
+        if (processed2.has(num)) return;
+        let b1 = amtMap[num].p2;
+        let rev = num[1] + num[0];
+
+        if (num === rev) {
+            lines2.push(`${num}-${b1}`);
+            processed2.add(num);
+        } else if (amtMap.hasOwnProperty(rev)) {
+            let b2 = amtMap[rev].p2;
+            if (b1 === b2) {
+                lines2.push(`${num} r ${b1}`);
+            } else {
+                lines2.push(`${num}-${b1} R ${b2}`);
+            }
+            processed2.add(num);
+            processed2.add(rev);
+        } else {
+            lines2.push(`${num}-${b1}`);
+            processed2.add(num);
+        }
+    });
+
+    // (၄) စာသားအဖြစ် ပေါင်းစပ်၍ Clipboard သို့ ကူးယူခြင်း
+    let finalText = "--- အပိုင်း (၁) [R ပုံစံ] ---\n" + lines1.join('\n') + 
+                    `\n----------\nTotal: ${total1.toLocaleString()}\n\n` +
+                    "--- အပိုင်း (၂) [R ပုံစံ] ---\n" + lines2.join('\n') + 
+                    `\n----------\nTotal: ${total2.toLocaleString()}`;
+    
+    copyToClipboard(finalText);
+    alert("✅ Split စာရင်းကို အပိုင်း (၁) နှင့် (၂) အဖြစ် R ပုံစံဖြင့် Copy ကူးပြီးပါပြီ!");
 }
+
   function processInput() {
     const field = $('rawInput'); 
     if (!field.value.trim() || activeIndex === -1) return;
