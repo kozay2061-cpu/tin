@@ -2,7 +2,7 @@
 <html lang="my">
 <head>
     <meta charset="UTF-8">
-    <title>2D လည်ဂျာ V.1.7.26 </title>
+    <title>2D လည်ဂျာ V.26.10.30 </title>
     <link rel="icon" href="https://i.ibb.co/6ckfFrqw/Gemini-Generated-Image-nlrzqsnlrzqsnlrz-1-1-1.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
@@ -688,10 +688,10 @@ input, textarea, select, .tab, .data-table td, .report-table td, .report-table t
                 <button onclick="copyHistoryLog()" style="flex:1;
                 background:#27ae60; color:white; border:none; border-radius:6px;
                 font-size:13px; font-weight:bold;">📋 တစ်ဦးချင်း စာရင်း</button>
-                <button onclick="copySplitOverLimitText()"
-                style="flex:1; background:#17a2b8; color:white; border:none;
-                border-radius:6px; font-size:13px; font-weight:bold;">📤 Copy
-                (Split)</button>
+                <button onclick="copySplitOverLimitText1()" style="flex:1; background:#17a2b8; color:white; border:none; border-radius:6px; font-size:13px; font-weight:bold;">📤 Copy (Split ပုံစံ-၁)</button>
+
+                <button onclick="copySplitOverLimitText2()" style="flex:1; background:#20c997; color:white; border:none; border-radius:6px; font-size:13px; font-weight:bold; margin-left: 5px;">📤 Copy (Split ပုံစံ-၂)</button>
+
                 <!-- ၁။ မူရင်း ကာရန် copy (အတိုင်းပဲ ထားပါ) -->
                 <button onclick="copyOverLimitText()" style="flex:1;
                 background:#f39c12; color:white; border:none; border-radius:6px;
@@ -1812,7 +1812,7 @@ function copyOverLimitTextR() {
     alert("✅ အတင်စာရင်း (R ပုံစံ) Copy ကူးပြီးပါပြီ!");
 }
 
-    function copySplitOverLimitText() {
+function copySplitOverLimitText() {
     let { exportData, currentSort } = getExportDataList();
     
     if (exportData.length === 0) {
@@ -1935,7 +1935,7 @@ function copyOverLimitTextR() {
     alert("✅ Split စာရင်းကို အပိုင်း (၁) နှင့် (၂) အဖြစ် R ပုံစံဖြင့် Copy ကူးပြီးပါပြီ!");
 }
 
-  function processInput() {
+function processInput() {
     const field = $('rawInput'); 
     if (!field.value.trim() || activeIndex === -1) return;
 
@@ -1963,7 +1963,7 @@ function copyOverLimitTextR() {
         line = line.replace(/ကျေးဇူး|တင်ပါတယ်|ရလား|ရမလား|လုပ်ပေးပါ|ထိုးမယ်|ပို|ဆို|ထဲက|သီးသန့်|အပြီး|စီး/g, ' ');
         line = line.replace(/ဒဲ့(?!ကပ်|k)/g, ' '); 
         line = line.replace(/တည့်/g, ' ');
-        line = line.replace(/[=\/\*\-\.\+]/g, ' '); 
+        line = line.replace(/[=\/\*\-\.\+]/g, ''); 
         line = line.replace(/ပတ်ရှင်း|ဒေးလီး|အပတ်ရှင်း|အပါတ်ရှင်း/g, ' ');
 
         // 🛑 [အရေးကြီး] စကားလုံးအရှည်တွေကို အရင် Replace လုပ်ပါ 🛑
@@ -2020,9 +2020,13 @@ function copyOverLimitTextR() {
         let matches = [];
         
                         // (၁) ထိပ် + နောက် / ထိပ် + R (သို့) Single HT တွဲလျက်ပုံစံများ (ပမာဏပေါင်းစပ်ခြင်း Logic ပါဝင်သည်)
-        let singleHtMatch = trim.match(/^(\d+)\s*(?:ht|th|ထိပ်နောက်)\s*(\d+)$/i);
-        let htMatch = trim.match(/^(\d+)\s*h\s*(\d+)\s*(?:t|n|နောက်)\s*(\d+)$/i);
-        let hrMatch = trim.match(/^(\d+)\s*h\s*(\d+)\s*r\s*(\d+)$/i);
+        
+        // ထိပ်၊ နောက် နှင့် space ပါလာသည်များကို ပိုမိုတိကျစွာ စစ်ဆေးပေးမည့် ပုံစံ
+        let cleanTrim = trim.replace(/\s+/g, ''); // ပထမဦးစွာ စာကြောင်းတစ်ကြောင်းလုံးရှိ space များကို အရင်ရှင်းထုတ်မည်
+
+        let singleHtMatch = cleanTrim.match(/^(\d+)(?:ht|th|ထိပ်နောက်)(\d+)$/i);
+        let htMatch = cleanTrim.match(/^(\d+)h(\d+)(?:t|n|နောက်)(\d+)$/i);
+        let hrMatch = cleanTrim.match(/^(\d+)h(\d+)r(\d+)$/i);
 
         if (singleHtMatch) {
             let digitStr = singleHtMatch[1];
@@ -2172,7 +2176,7 @@ function copyOverLimitTextR() {
         field.value = ""; 
     }
 }
-  function processStandardCommands(line, matches) {
+function processStandardCommands(line, matches) {
     // English Shortcut များ
     const SHORTCUT_LISTS = { 
         'ap': ["00","11","22","33","44","55","66","77","88","99"], 
@@ -4105,6 +4109,154 @@ function closeHistoryModal() {
     // ၄။ Clipboard သို့ ကူးယူခြင်း
     copyToClipboard(finalText);
     alert("ငွေပမာဏကို တစ်ဝက်စီခွဲ၍ အပိုင်း (၁) နှင့် (၂) အဖြစ် Copy ကူးပြီးပါပြီ။");
+}
+// --- ပုံစံ (၁): မူရင်းပုံစံ (01-650 R 850) ---
+function copySplitOverLimitText1() {
+    let { exportData, currentSort } = getExportDataList();
+    if (exportData.length === 0) { alert("⚠️ အတင်မရှိပါ"); return; }
+
+    let amtMap = {};
+    let total1 = 0, total2 = 0;
+    let unevenSplitCounter = 0;
+
+    exportData.forEach(item => {
+        let fullAmt = item.amt;
+        let splitAmt = Math.floor(fullAmt / 2);
+        let rem = fullAmt % 2; 
+        let amt1, amt2;
+        
+        if (rem === 0) { 
+            if (splitAmt % 50 !== 0) { 
+                let floorVal = Math.floor(splitAmt / 50) * 50; 
+                let ceilVal = Math.ceil(splitAmt / 50) * 50;   
+                if (unevenSplitCounter % 2 === 0) { amt1 = ceilVal; amt2 = floorVal; } 
+                else { amt1 = floorVal; amt2 = ceilVal; }
+                unevenSplitCounter++; 
+            } else { amt1 = splitAmt; amt2 = splitAmt; }
+        } else { 
+            if (unevenSplitCounter % 2 === 0) { amt1 = splitAmt + rem; amt2 = splitAmt; } 
+            else { amt1 = splitAmt; amt2 = splitAmt + rem; }
+            unevenSplitCounter++; 
+        }
+
+        if (!amtMap[item.num]) amtMap[item.num] = { p1: 0, p2: 0 };
+        amtMap[item.num].p1 += amt1;
+        amtMap[item.num].p2 += amt2;
+        total1 += amt1; total2 += amt2;
+    });
+
+    let getLines = (isPart1) => {
+        let processed = new Set();
+        let lines = [];
+        let sortedNums = Object.keys(amtMap).sort();
+
+        sortedNums.forEach(num => {
+            if (processed.has(num)) return;
+            let a1 = isPart1 ? amtMap[num].p1 : amtMap[num].p2;
+            let rev = num[1] + num[0];
+
+            if (num === rev) {
+                lines.push(`${num}-${a1}`);
+                processed.add(num);
+            } else if (amtMap.hasOwnProperty(rev)) {
+                let a2 = isPart1 ? amtMap[rev].p1 : amtMap[rev].p2;
+                if (a1 === a2) {
+                    lines.push(`${num} r ${a1}`);
+                } else {
+                    lines.push(`${num}-${a1} R ${a2}`);
+                }
+                processed.add(num);
+                processed.add(rev);
+            } else {
+                lines.push(`${num}-${a1}`);
+                processed.add(num);
+            }
+        });
+        return lines;
+    };
+
+    let finalText = "--- အပိုင်း (၁) [R ပုံစံ] ---\n" + getLines(true).join('\n') + 
+                    `\n----------\nTotal: ${total1.toLocaleString()}\n\n` +
+                    "--- အပိုင်း (၂) [R ပုံစံ] ---\n" + getLines(false).join('\n') + 
+                    `\n----------\nTotal: ${total2.toLocaleString()}`;
+    
+    copyToClipboard(finalText);
+    alert("✅ Split ပုံစံ (၁) Copy ကူးပြီးပါပြီ!");
+}
+
+// --- ပုံစံ (၂): လည်ဂျာထဲ Total မှန်စေမည့် ပုံစံအသစ် (01 r650 850) ---
+function copySplitOverLimitText2() {
+    let { exportData, currentSort } = getExportDataList();
+    if (exportData.length === 0) { alert("⚠️ အတင်မရှိပါ"); return; }
+
+    let amtMap = {};
+    let total1 = 0, total2 = 0;
+    let unevenSplitCounter = 0;
+
+    exportData.forEach(item => {
+        let fullAmt = item.amt;
+        let splitAmt = Math.floor(fullAmt / 2);
+        let rem = fullAmt % 2; 
+        let amt1, amt2;
+        
+        if (rem === 0) { 
+            if (splitAmt % 50 !== 0) { 
+                let floorVal = Math.floor(splitAmt / 50) * 50; 
+                let ceilVal = Math.ceil(splitAmt / 50) * 50;   
+                if (unevenSplitCounter % 2 === 0) { amt1 = ceilVal; amt2 = floorVal; } 
+                else { amt1 = floorVal; amt2 = ceilVal; }
+                unevenSplitCounter++; 
+            } else { amt1 = splitAmt; amt2 = splitAmt; }
+        } else { 
+            if (unevenSplitCounter % 2 === 0) { amt1 = splitAmt + rem; amt2 = splitAmt; } 
+            else { amt1 = splitAmt; amt2 = splitAmt + rem; }
+            unevenSplitCounter++; 
+        }
+
+        if (!amtMap[item.num]) amtMap[item.num] = { p1: 0, p2: 0 };
+        amtMap[item.num].p1 += amt1;
+        amtMap[item.num].p2 += amt2;
+        total1 += amt1; total2 += amt2;
+    });
+
+    let getLinesNew = (isPart1) => {
+        let processed = new Set();
+        let lines = [];
+        let sortedNums = Object.keys(amtMap).sort();
+
+        sortedNums.forEach(num => {
+            if (processed.has(num)) return;
+            let a1 = isPart1 ? amtMap[num].p1 : amtMap[num].p2;
+            let rev = num[1] + num[0];
+
+            if (num === rev) {
+                lines.push(`${num}-${a1}`);
+                processed.add(num);
+            } else if (amtMap.hasOwnProperty(rev)) {
+                let a2 = isPart1 ? amtMap[rev].p1 : amtMap[rev].p2;
+                if (a1 === a2) {
+                    lines.push(`${num} r ${a1}`);
+                } else {
+                    // လည်ဂျာထဲ Total လုံးဝမလွဲစေမည့် ပုံစံ
+                    lines.push(`${num} r${a1} ${a2}`);
+                }
+                processed.add(num);
+                processed.add(rev);
+            } else {
+                lines.push(`${num}-${a1}`);
+                processed.add(num);
+            }
+        });
+        return lines;
+    };
+
+    let finalText = "--- အပိုင်း (၁) [R ပုံစံ] ---\n" + getLinesNew(true).join('\n') + 
+                    `\n----------\nTotal: ${total1.toLocaleString()}\n\n` +
+                    "--- အပိုင်း (၂) [R ပုံစံ] ---\n" + getLinesNew(false).join('\n') + 
+                    `\n----------\nTotal: ${total2.toLocaleString()}`;
+    
+    copyToClipboard(finalText);
+    alert("✅ Split ပုံစံ (၂) ကို အောင်မြင်စွာ Copy ကူးပြီးပါပြီ!");
 }
 
 </script>
