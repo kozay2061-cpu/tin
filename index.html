@@ -1945,10 +1945,16 @@ function processInput() {
     const WARNING_LIMIT = 30000; 
     let todayDate = new Date().toISOString().split('T')[0];
 
-    for (let rawLine of rawLines) {
+        for (let rawLine of rawLines) {
         if (!rawLine.trim()) continue;
+
         let line = uniToEng(rawLine.toLowerCase());
-        
+
+        // ✅ အဓိက ပြင်ဆင်ချက်: ထိပ်, နောက်, ထိပ်နောက်, r (အသွားအပြန်) ရှေ့က ဂဏန်းများကြား space များကို အလိုအလျောက် ပေါင်းပေးခြင်း
+        line = line.replace(/(\d+)(?:\s+(\d+))+(?=\s*(?:h|t|th|ht|ထိပ်|နောက်|ထိပ်နောက်))/gi, function(match) {
+            return match.replace(/\s+/g, '');
+        });
+
         // 🔥 [ဒီနေရာမှာ အရင်ဆုံး ထားရပါမယ်] 'ည' မဖျက်ခင် bro အရင်ပြောင်းပါ 🔥
         line = line.replace(/(\d+)\s*ခွေ\s*(\d+)\s*(?:အ)?ပူး(?:ပါ)?/g, '$1 kp $2');
         line = line.replace(/kအပူးပါ|အပူးပါခွေ|ခွေအပူးပါ|ခွေp|ခွေa|ခွေပူး|ခပ|ka/g, 'kp'); 
@@ -1956,6 +1962,7 @@ function processInput() {
         line = line.replace(/ပါဝါ|ပဝ|power/g, 'pw');
         line = line.replace(/အပါ|ပတ်သီး|ပါတ်|ပတ်|ပါ/g, 'p');
 
+          
         // ပြီးမှ အောက်က ဟာတွေ ဆက်လုပ်ပါ
         line = line.replace(/ဆရာ|ဦး|ဒေါ်|ဗျာ|ခင်ဗျာ|ရှင့်|နော်|ok|help|plz|hi|hello|mingalarpar/g, ' ');
         line = line.replace(/မနက်|ညနေ|နေ့လည်|နံ|နံက်|ည|morning|evening|am|pm/g, ' ');
@@ -1963,7 +1970,7 @@ function processInput() {
         line = line.replace(/ကျေးဇူး|တင်ပါတယ်|ရလား|ရမလား|လုပ်ပေးပါ|ထိုးမယ်|ပို|ဆို|ထဲက|သီးသန့်|အပြီး|စီး/g, ' ');
         line = line.replace(/ဒဲ့(?!ကပ်|k)/g, ' '); 
         line = line.replace(/တည့်/g, ' ');
-        line = line.replace(/[=\/\*\-\.\+]/g, ''); 
+        line = line.replace(/[=\/\*\-\.\+]/g, ' '); 
         line = line.replace(/ပတ်ရှင်း|ဒေးလီး|အပတ်ရှင်း|အပါတ်ရှင်း/g, ' ');
 
         // 🛑 [အရေးကြီး] စကားလုံးအရှည်တွေကို အရင် Replace လုပ်ပါ 🛑
@@ -2019,15 +2026,12 @@ function processInput() {
         let id = Date.now() + Math.random(); 
         let matches = [];
         
-                        // (၁) ထိပ် + နောက် / ထိပ် + R (သို့) Single HT တွဲလျက်ပုံစံများ (ပမာဏပေါင်းစပ်ခြင်း Logic ပါဝင်သည်)
+        // (၁) ထိပ် + နောက် (သို့မဟုတ်) Single HT / HR များကို စစ်ဆေးခြင်း
+        let singleHtMatch = trim.match(/^(\d+)\s*(?:ht|th|ထိပ်နောက်)\s*(\d+)$/i);
+let htMatch = trim.match(/^(\d+)\s*h\s*(\d+)\s*(?:t|n|နောက်)\s*(\d+)$/i);
+let hrMatch = trim.match(/^(\d+)\s*h\s*(\d+)\s*(?:r|အာ)\s*(\d+)$/i);
+      
         
-        // ထိပ်၊ နောက် နှင့် space ပါလာသည်များကို ပိုမိုတိကျစွာ စစ်ဆေးပေးမည့် ပုံစံ
-        let cleanTrim = trim.replace(/\s+/g, ''); // ပထမဦးစွာ စာကြောင်းတစ်ကြောင်းလုံးရှိ space များကို အရင်ရှင်းထုတ်မည်
-
-        let singleHtMatch = cleanTrim.match(/^(\d+)(?:ht|th|ထိပ်နောက်)(\d+)$/i);
-        let htMatch = cleanTrim.match(/^(\d+)h(\d+)(?:t|n|နောက်)(\d+)$/i);
-        let hrMatch = cleanTrim.match(/^(\d+)h(\d+)r(\d+)$/i);
-
         if (singleHtMatch) {
             let digitStr = singleHtMatch[1];
             let amt = parseInt(singleHtMatch[2]);
@@ -2040,7 +2044,6 @@ function processInput() {
                     let isRear = numStr.endsWith(d);
                     
                     if (isHead && isRear) {
-                        // အပူးဂဏန်း (ဥပမာ 11) ဖြစ်ပြီး ထိပ်ရောနောက်ပါ တစ်ခါတည်းပိုင်ရင် ပမာဏ ၂ ဆ (သို့) တိုက်ရိုက်ပေါင်းထည့်ရန်
                         matches.push({ num: numStr, amt: amt * 2 });
                     } else if (isHead || isRear) {
                         matches.push({ num: numStr, amt: amt });
@@ -2062,7 +2065,6 @@ function processInput() {
                     let isRear = numStr.endsWith(d);    
                     
                     if (isHead && isRear) {
-                        // ထိပ်ရော နောက်ပါ တစ်ပြိုင်နက်တူညီနေသည့် အပူးကွက်များအတွက် ပမာဏ ၂ ခု ပေါင်းထည့်မည်
                         matches.push({ num: numStr, amt: hAmt + secondAmt });
                     } else {
                         if (isHead) matches.push({ num: numStr, amt: hAmt });
@@ -2071,8 +2073,6 @@ function processInput() {
                 }
             });
         }
-
-
         else { 
             let dkMatch = trim.match(/^(\d+)\s*dk\s*(\d+)\s*[\s,]+(\d+)(?:\s*(?:r|အာ)\s*(\d+))?/i);
             if (dkMatch) {
