@@ -205,14 +205,96 @@ body {
     border-collapse: collapse; /* table line တွေကို တစ်ထပ်တည်းဖြစ်စေဖို့ */
     width: 100%;
 }
-.help-table th, .help-table td {
-    border: 3px solid #ddd; /* ဘောင်အနားသတ် အရောင်နဲ့ အထူ */
-    padding: 12px; /* စာသားနဲ့ အနားသတ်ကြား အကွာအဝေး */
-    text-align: Center;
+/* =========================================
+   📖 အသုံးပြုနည်း လမ်းညွှန် (Help Modal) ဒီဇိုင်းအသစ်
+   ========================================= */
+.help-content {
+    background: #ffffff !important;
+    color: #333 !important;
+    width: 95% !important;
+    max-width: 650px !important;
+    max-height: 85vh !important;
+    border-radius: 16px !important;
+    padding: 25px !important;
+    overflow-y: auto !important;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.25) !important;
+    border-top: 6px solid #1976d2 !important; /* အပေါ်ဘက် အပြာရောင် ခုံတန်းလေးထည့်ခြင်း */
 }
-.help-table thead {
-    background-color: #f8f9fa; /* ခေါင်းစဉ်ပိုင်းကို အရောင်ဖျော့လေး ထည့်တာပါ */
+
+/* ခေါင်းစဉ်ပိုင်း */
+.help-content h2 {
+    color: #1565c0 !important;
+    font-size: 20px !important;
+    border-bottom: 2px solid #e3f2fd !important;
+    padding-bottom: 10px !important;
+    margin-bottom: 15px !important;
 }
+
+/* ကဏ္ဍခွဲ ခေါင်းစဉ်များ */
+.help-section h3 {
+    color: #2c3e50 !important;
+    font-size: 16px !important;
+    margin-top: 20px !important;
+    margin-bottom: 10px !important;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ကုဒ်ဘောက်စ် (Code Badge) လေးများ */
+.cmd-code {
+    background: #e3f2fd !important;
+    color: #0d47a1 !important;
+    padding: 3px 8px !important;
+    border-radius: 6px !important;
+    font-weight: bold !important;
+    font-family: monospace !important;
+    border: 1px solid #bbdefb !important;
+}
+
+/* ဥပမာ စာသားများ */
+.example-text {
+    color: #d32f2f !important; /* အနီရောင်ဖျော့ဖျော့ဖြင့် ဥပမာများကို ပိုထင်ရှားစေခြင်း */
+    font-size: 12px !important;
+    font-style: italic !important;
+}
+
+/* ဇယားကွက် ဒီဇိုင်း */
+.help-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin-top: 10px !important;
+    margin-bottom: 15px !important;
+    border-radius: 8px !important;
+    overflow: hidden !important;
+}
+
+.help-table th {
+    background: linear-gradient(135deg, #1976d2, #1565c0) !important;
+    color: white !important;
+    padding: 12px !important;
+    font-size: 14px !important;
+    text-align: center !important;
+}
+
+.help-table td {
+    border: 1px solid #e0e0e0 !important;
+    padding: 10px 12px !important;
+    font-size: 13px !important;
+    color: #333 !important;
+    vertical-align: middle !important;
+    background: #fafafa !important;
+}
+
+.help-table tr:nth-child(even) td {
+    background: #f5f5f5 !important; /* တစ်တန်းခြား နောက်ခံအရောင်ဖျော့ထည့်ခြင်း */
+}
+
+.help-table td:first-child {
+    text-align: center !important;
+    font-weight: bold !important;
+}
+
  /* ========================================
    MOBILE & TABLET RESPONSIVE FIX (New)
    ==================================== */
@@ -411,6 +493,7 @@ input, textarea, select, .tab, .data-table td, .report-table td, .report-table t
 #userTabs:active {
     cursor: grabbing; /* ဆွဲနေတဲ့အချိန် လက်ဆုပ်ထားတဲ့ပုံ ပြမယ် */
 }
+  
 </style>
   
 <input type="file" id="fileInput" accept="*/*" style="display: none;" onchange="handleFileUpload(this)">
@@ -450,6 +533,11 @@ input, textarea, select, .tab, .data-table td, .report-table td, .report-table t
             </div>
     </div>
 </div>    
+  <div style="display: flex; align-items: right; margin: 5px 0;">
+    <button onclick="location.href='3d.html'" style="background-color: #2196F3; color: white; padding: 8px 15px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">
+      👉 3D သို့သွားရန် </button>
+  </div>
+
  <!-- ခလုတ်များ အပိုင်း (အစ) -->
 <div style="display: flex; align-items: center; gap: 5px; margin: 5px 0;">
     <button onclick="saveCurrentSession()" style="background:#27ae60; color:white; padding: 6px 10px; font-size:12px; border:none; border-radius:4px; white-space: nowrap; display: flex; align-items: center; gap: 3px;">
@@ -475,11 +563,11 @@ input, textarea, select, .tab, .data-table td, .report-table td, .report-table t
 <!-- အောက်ခြေခလုတ်များ အပိုင်း (အဆုံး) -->
 
             </div>
-<div id="helpModal">
+<div id="helpModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:2000; justify-content:center; align-items:center; backdrop-filter: blur(3px);">
     <div class="help-content">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
-            <h2 style="margin:0; color:#1a73e8;">📖 အသုံးပြုနည်း လမ်းညွှန်</h2>
-            <button onclick="$('helpModal').style.display='none'" style="background:none; border:none; font-size:24px; cursor:pointer; color:#666;">&times;</button>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <h2 style="margin:0;">📖 အသုံးပြုနည်း လမ်းညွှန်</h2>
+            <button onclick="$('helpModal').style.display='none'" style="background:#ff5252; color:white; border:none; border-radius:50%; width:32px; height:32px; font-size:18px; cursor:pointer; font-weight:bold;">&times;</button>
         </div>
         <div class="help-section">
         <h3><b>......(မှတ်ချက်- Setting ကိုပြင်ဆင်ပြီးတိုင်း Save လုပ် ပေးပါ။</b></h3>
@@ -620,6 +708,16 @@ input, textarea, select, .tab, .data-table td, .report-table td, .report-table t
     </div>
     <div style="border-top: 1px solid #bbdefb; margin-bottom: 1px; text-align: center; margin-top: 5px; background: #05FF2A; font-size:18px; colour: #04C220; font-weight: bold; white-space: nowrap; border-radius: 8px;">
     Grand Total: <span id="grandTotalDisplay">0</span>
+</div> 
+   <!-- ပေါက်သူများ စာရင်းပြမည့် အောက်ဆုံး Box -->
+<div style="background: white; border: 1px solid #ddd; border-radius: 8px; padding: 8px; margin: 8px 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+    <div style="font-weight: bold; color: #d32f2f; margin-bottom: 4px; font-size: 13px; display: flex; justify-content: space-between; align-items: center;">
+        <span>🏆 ပေါက်စာရင်း (Winners)</span>
+        <span id="bottomWinNumDisp" style="font-size: 11px; background: #ffebee; color: #c62828; padding: 2px 6px; border-radius: 4px;">ပေါက်ဂဏန်း မရှိသေးပါ</span>
+    </div>
+    <div id="bottomWinnersList" style="font-size: 12px; color: #333; max-height: 120px; overflow-y: auto;">
+        <span style="color: #888;">Win ကွက်လပ်တွင် ပေါက်ဂဏန်းထည့်ပါ</span>
+    </div>
 </div>
 <div style="width: 100%; display: flex; flex-direction: column; gap: 10px; box-sizing: border-box; padding: 5px;">
             <div style="background: white; border-radius: 8px; padding: 5px 5px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #eee;">
@@ -716,6 +814,7 @@ input, textarea, select, .tab, .data-table td, .report-table td, .report-table t
 
     <div id="rawLog" style="flex:1; overflow-y:auto; padding:5px;"></div>
 </div>
+
         <div class="right-panel">
             <div id="userTabs" style="padding: 5px; overflow-x: auto; white-space: nowrap; background: #eaeff2; border-radius: 8px; text-align: left;"></div>
             <div class="user-info-box">
@@ -757,6 +856,20 @@ input, textarea, select, .tab, .data-table td, .report-table td, .report-table t
             <span id="limitFooterTotal" style="font-size: 16px; font-weight: 900; color: #d32f2f;">0</span>
         </div>
 
+    </div>
+</div>
+<!-- Custom Confirm Modal (2D Ledger အမည်ဖြင့် ပြသရန်) -->
+<div id="customConfirm" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:99999; justify-content:center; align-items:center; backdrop-filter: blur(2px);">
+    <div style="background:white; padding:25px; border-radius:12px; width:85%; max-width:320px; text-align:center; box-shadow:0 10px 25px rgba(0,0,0,0.3);">
+        <!-- ဒီနေရာမှာ 2D Ledger လို့ ပြောင်းလဲပေးလိုက်ပါပြီ -->
+        <h3 style="color:#2c3e50; margin-top:0; font-size:18px;">📘 2-3 Ledger</h3>
+        
+        <p id="confirmMessage" style="margin:15px 0 20px 0; font-size:16px; color:#333; line-height:1.5;">သေချာပါသလား?</p>
+        
+        <div style="display:flex; gap:10px;">
+            <button id="confirmNo" style="flex:1; padding:10px; background:#bdc3c7; color:#333; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">မလုပ်ပါ</button>
+            <button id="confirmYes" style="flex:1; padding:10px; background:#e74c3c; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">သေချာသည်</button>
+        </div>
     </div>
 </div>
 
@@ -905,11 +1018,13 @@ input, textarea, select, .tab, .data-table td, .report-table td, .report-table t
 <script>
 // --- ၁။ Data သိမ်းဆည်းခြင်း Function (Auto Calculation) 
 function clearHistoryLog() {
-    if(confirm("မှတ်တမ်းအားလုံးကို ဖျက်မှာ သေချာပါသလား?")) {
+    // မူရင်း confirm အစား CustomConfirm ကို သုံးထားပါပြီ
+    CustomConfirm.show("မှတ်တမ်းအားလုံးကို ဖျက်မှာ သေချာပါသလား?", () => {
         localStorage.removeItem('my_weekly_record');
         openHistoryModal(); 
-    }
+    });
 }
+
 </script>
 
     <button onclick="document.getElementById('fileInput').click()" style="width:100%; padding:15px; background:#17a2b8 !important; color:white !important; border:none; border-radius:6px; margin-top:10px; font-weight:bold; cursor:pointer;">
@@ -920,7 +1035,7 @@ function clearHistoryLog() {
     <h4 style="font-weight: bold; margin-bottom: 5px;">SHORTCUTS</h4>
     
     <div id="shortcutInputs"></div>
-
+ 
     <hr style="border-top: 2px solid #ccc; margin: 20px 0;">
 
     <div style="text-align: center; margin-bottom: 5px;">
@@ -1214,6 +1329,7 @@ if (!settings.customLimits) settings.customLimits = {};
     if(typeof updatePreLimitStats === "function") updatePreLimitStats(); 
     if(typeof updateOverLimitStats === "function") updateOverLimitStats(); 
     if(typeof updateExportDisplay === "function") updateExportDisplay();
+    updateBottomWinners();
 }
   function getOriginalTotals() {
     let totals = Array(100).fill(0);
@@ -1586,8 +1702,7 @@ if (!settings.customLimits) settings.customLimits = {};
  }
      // (၃) ပြန်ဖွင့်မည် (Load)
   function loadArchive(id) {
-        if(!confirm("⚠️ သတိပေးချက်:\nလက်ရှိရိုက်ထားသော စာရင်းများ ပျက်သွားပြီး၊ ရွေးချယ်သော စာရင်းကို အစားထိုးပါမည်။ ဆက်လုပ်မလား?")) return;
-
+    CustomConfirm.show("⚠️ လက်ရှိရိုက်ထားသော စာရင်းများ ပျက်သွားပြီး၊ ရွေးချယ်သော စာရင်းကို အစားထိုးပါမည်။ ဆက်လုပ်မလား?", () => {
         let archives = JSON.parse(localStorage.getItem('2d_archives')) || [];
         let file = archives.find(f => f.id === id);
         
@@ -1600,7 +1715,9 @@ if (!settings.customLimits) settings.customLimits = {};
             document.getElementById('archiveModal').style.display = 'none';
             alert("📂 စာရင်းဟောင်း ပြန်ရောက်ပါပြီ။");
         }
-    }
+    });
+}
+
   function updateHistoryTable() {
     var archives = JSON.parse(localStorage.getItem('myLedgerDB')) || [];
     
@@ -1675,12 +1792,14 @@ if (!settings.customLimits) settings.customLimits = {};
 }
     // (၄) ဖျက်မည် (Delete)
   function deleteArchive(id) {
-        if(!confirm("ဒီမှတ်တမ်းကို ဖျက်မှာ သေချာလား?")) return;
+    CustomConfirm.show("ဒီမှတ်တမ်းကို ဖျက်မှာ သေချာလား?", () => {
         let archives = JSON.parse(localStorage.getItem('2d_archives')) || [];
         archives = archives.filter(f => f.id !== id);
         localStorage.setItem('2d_archives', JSON.stringify(archives));
-        openArchiveModal(); // စာရင်းပြန် Refresh လုပ်မယ်
-    }
+        openArchiveModal();
+    });
+}
+
   function copyHistoryLog() {
         let targetName = activeIndex === -1 ? "ချုပ်" : customers[activeIndex].name; let historyLines = ""; let totalAmt = 0;
         if (activeIndex === -1) { customers.forEach(c => { c.history.forEach(h => { historyLines += `[${c.name}] ${h.text}\n`; }); c.data.forEach(d => totalAmt += d.amt); }); } else { let user = customers[activeIndex]; if (user && user.history) { user.history.forEach(h => { historyLines += `${h.text}\n`; }); user.data.forEach(d => totalAmt += d.amt); } }
@@ -2238,10 +2357,11 @@ function processStandardCommands(line, matches) {
                     if (['k', 'kp', 'ခွေ'].includes(cmd)) {
                         let hasDuplicate = globalNums.some((val, idx, arr) => arr.indexOf(val) !== idx);
                         if (hasDuplicate) {
-                            alert("⚠️ အမှား: ထည့်သွင်းထားသော ခွေဂဏန်းထဲတွင် ဂဏန်းနှစ်ခါထပ်နေပါသည် (ဥပမာ - " + globalNums.join('') + ")။ ဤစာရင်းကို ထည့်သွင်း၍မရပါ။");
+                            CustomConfirm.show("⚠️ အမှား: ထည့်သွင်းထားသော ခွေဂဏန်းထဲတွင် ဂဏန်းနှစ်ခါထပ်နေပါသည် (ဥပမာ - " + globalNums.join('') + ")။ ဤစာရင်းကို ထည့်သွင်း၍မရပါ။", () => {});
                             return; 
                         }
                     }
+
                     // -------------------------------------------------------------
 
                     if (cmd === 'h' || cmd === 'ထိပ်') globalNums.forEach(n => AL.forEach(x => addMatch(n + x, amt)));
@@ -2278,7 +2398,7 @@ function processStandardCommands(line, matches) {
   function toggleSidebar() { 
       $('sidebar').classList.toggle('active'); $('overlay').classList.toggle('active'); }
   function saveWinNum() { 
-      settings.winNum = $('winNum').value; saveToStorage(); renderAll(); }
+      settings.winNum = $('winNum').value; saveToStorage(); renderAll(); updateBottomWinners(); }
   function saveQuickLimit() { 
       settings.limit = parseInt($('limitInput').value) || 0; saveToStorage(); renderAll(); }
   function saveAsImage(id, fileName) {
@@ -2299,11 +2419,35 @@ function processStandardCommands(line, matches) {
     });
 }
   function deleteLine(id) { 
-      if(confirm("ဖျက်မလား?")) { customers[activeIndex].data=customers[activeIndex].data.filter(d=>d.id!==id); customers[activeIndex].history=customers[activeIndex].history.filter(h=>h.id!==id); saveToStorage(); renderAll(); } }
+    CustomConfirm.show("ဤစာရင်းလိုင်းကို ဖျက်မှာ သေချာပါသလား?", () => {
+        customers[activeIndex].data = customers[activeIndex].data.filter(d => d.id !== id); 
+        customers[activeIndex].history = customers[activeIndex].history.filter(h => h.id !== id); 
+        saveToStorage(); 
+        renderAll(); 
+    }); 
+}
+
   function selectAllRows() { 
       const checkboxes = document.querySelectorAll('.row-checkbox'); const anyUnchecked = Array.from(checkboxes).some(cb => !cb.checked); checkboxes.forEach(cb => cb.checked = anyUnchecked); }
   function deleteSelectedRows() { 
-      if (activeIndex === -1 || !customers[activeIndex]) return; const checkboxes = document.querySelectorAll('.row-checkbox:checked'); if (checkboxes.length === 0) return alert("ဖျက်လိုသော စာရင်းများကို အရင်ရွေးပါ"); if (confirm(`ရွေးချယ်ထားသော စာရင်း (${checkboxes.length}) ခုကို ဖျက်မှာ သေချာပါသလား?`)) { const indicesToDelete = Array.from(checkboxes).map(cb => parseInt(cb.getAttribute('data-index'))).sort((a, b) => b - a); indicesToDelete.forEach(idx => { let historyItem = customers[activeIndex].history[idx]; if (historyItem) { customers[activeIndex].data = customers[activeIndex].data.filter(d => d.id !== historyItem.id); customers[activeIndex].history.splice(idx, 1); } }); saveToStorage(); renderAll(); } }
+    if (activeIndex === -1 || !customers[activeIndex]) return; 
+    const checkboxes = document.querySelectorAll('.row-checkbox:checked'); 
+    if (checkboxes.length === 0) return alert("ဖျက်လိုသော စာရင်းများကို အရင်ရွေးပါ"); 
+    
+    CustomConfirm.show(`ရွေးချယ်ထားသော စာရင်း (${checkboxes.length}) ခုကို ဖျက်မှာ သေချာပါသလား?`, () => {
+        const indicesToDelete = Array.from(checkboxes).map(cb => parseInt(cb.getAttribute('data-index'))).sort((a, b) => b - a); 
+        indicesToDelete.forEach(idx => { 
+            let historyItem = customers[activeIndex].history[idx]; 
+            if (historyItem) { 
+                customers[activeIndex].data = customers[activeIndex].data.filter(d => d.id !== historyItem.id); 
+                customers[activeIndex].history.splice(idx, 1); 
+            } 
+        }); 
+        saveToStorage(); 
+        renderAll(); 
+    });
+}
+
   function exportBackup() { 
     const now = new Date();
     
@@ -3773,19 +3917,16 @@ function viewMonthlyReport() {
 // 🚀 1. MASTER SAVE SYSTEM (Updated for Date Accuracy)
 // =========================================
 function saveMasterSystem() {
-    // ၁။ စာရင်းရှိမရှိ စစ်ဆေးခြင်း
     if (!customers || customers.length === 0) {
-        alert("သိမ်းဆည်းစရာ Customer စာရင်းမရှိပါ။");
+        alert("သိမ်းစရာ Customer စာရင်းမရှိပါ။");
         return;
     }
 
-    // ၂။ ရက်စွဲနှင့် ဆက်တင်များ
     var now = new Date();
     var offset = now.getTimezoneOffset() * 60000;
-    var localISOTime = (new Date(now - offset)).toISOString().slice(0, 10); // YYYY-MM-DD
+    var localISOTime = (new Date(now - offset)).toISOString().slice(0, 10);
     var dateString = localISOTime;
 
-    // ၃။ Grand Total တွက်ချက်ခြင်း (History ပြရန်အတွက်)
     var grandTotal = 0;
     customers.forEach(c => {
         var cTotal = c.data.reduce((a, b) => a + Number(b.amt || 0), 0);
@@ -3797,31 +3938,20 @@ function saveMasterSystem() {
         return;
     }
 
-    if(confirm("စုစုပေါင်း ရောင်းရငွေ: " + grandTotal.toLocaleString() + " ကျပ်\nBackup ယူပြီး သိမ်းဆည်းမည်။ သေချာပါသလား?")) {
-        
-        // ============================================
-        // အပိုင်း (က) - ဖုန်း Screen ပေါ်က History အတွက်
-        // (စာရင်းချုပ်ကိုသာ သိမ်းမည်)
-        // ============================================
+    CustomConfirm.show("စုစုပေါင်း ရောင်းရငွေ: " + grandTotal.toLocaleString() + " ကျပ်\nBackup ယူပြီး သိမ်းဆည်းမည်။ သေချာပါသလား?", () => {
         var historyItem = {
             date: dateString,
             total: grandTotal, 
             customerCount: customers.length,
             timestamp: new Date().getTime(),
-            // History ပြတဲ့နေရာက လိုအပ်မယ့် အခြား key များ (လိုအပ်လျှင်)
-            net: 0, // လိုအပ်ရင် တွက်ထည့်ပါ
-            profit: 0 // လိုအပ်ရင် တွက်ထည့်ပါ
+            net: 0, 
+            profit: 0 
         };
 
         var oldDB = JSON.parse(localStorage.getItem('myLedgerDB')) || [];
         oldDB.push(historyItem);
         localStorage.setItem('myLedgerDB', JSON.stringify(oldDB));
 
-
-        // ============================================
-        // အပိုင်း (ခ) - Backup File Download (Raw Data)
-        // (Restore ပြန်လုပ်ရန် Customer အကုန်ပါမည်)
-        // ============================================
         var fullSystemData = {
             customers: customers,       
             settings: settings || {},   
@@ -3839,11 +3969,9 @@ function saveMasterSystem() {
         downloadAnchorNode.remove();
         
         alert("✅ အောင်မြင်ပါသည်။\n- History တွင် မှတ်တမ်းဝင်သွားပါပြီ။\n- Backup ဖိုင်လည်း ရပါပြီ။");
-        
-        // (Optional) သိမ်းပြီးရင် စာရင်းရှင်းမလား?
-        // customers = []; updateUI(); // လိုအပ်ရင် သုံးရန်
-    }
+    });
 }
+
 // ==========================================
 // ဒီကုဒ်ကို Script ဖိုင်ရဲ့ အောက်ဆုံးမှာ ထားပေးပါfunction
 // ==========================================
@@ -4258,6 +4386,83 @@ function copySplitOverLimitText2() {
     copyToClipboard(finalText);
     alert("✅ Split ပုံစံ (၂) ကို အောင်မြင်စွာ Copy ကူးပြီးပါပြီ!");
 }
+  function updateBottomWinners() {
+    let winNum = document.getElementById('winNum') ? document.getElementById('winNum').value.trim() : (settings.winNum || "");
+    let container = document.getElementById('bottomWinnersList');
+    let badge = document.getElementById('bottomWinNumDisp');
+    if (!container) return;
+
+    if (!winNum) {
+        if(badge) badge.innerText = "ပေါက်ဂဏန်း မရှိသေးပါ";
+        container.innerHTML = '<span style="color: #888;">Win ကွက်လပ်တွင် ပေါက်ဂဏန်းထည့်ပါ</span>';
+        return;
+    }
+
+    if(badge) badge.innerText = `ပေါက်ဂဏန်း: ${winNum}`;
+
+    let winnersHtml = '';
+    let odds = settings.odds || 80;
+    let hasWinner = false;
+
+    // Customer တစ်ဦးချင်းစီကို စစ်ဆေးမည်
+    customers.forEach(c => {
+        let winEntries = c.data.filter(d => d.num == winNum);
+        if (winEntries.length > 0) {
+            hasWinner = true;
+            let totalWinAmt = winEntries.reduce((sum, item) => sum + item.amt, 0);
+            let payout = totalWinAmt * odds; // ရမည့်ပေါက်ကြေး
+            
+            winnersHtml += `<div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #eee; padding: 4px 0; align-items: center;">
+                <span style="font-weight: bold; color: #1a73e8;">👤 ${c.name}</span>
+                <span style="color: #333;">ထိုးငွေ: <b style="color: #d9534f;">${totalWinAmt.toLocaleString()}</b> | ရရန်: <b style="color: #2e7d32;">${payout.toLocaleString()}</b></span>
+            </div>`;
+        }
+    });
+
+    if (!hasWinner) {
+        container.innerHTML = `<span style="color: #c62828;">ပေါက်ဂဏန်း (${winNum}) ဖြင့် ထိုးထားသူ မရှိပါ</span>`;
+    } else {
+        container.innerHTML = winnersHtml;
+    }
+}
+// Custom Confirmation Helper Object
+// Custom Confirmation Helper Object (Updated)
+const CustomConfirm = {
+    show(message, onYes) {
+        const modal = document.getElementById('customConfirm');
+        const msgEl = document.getElementById('confirmMessage');
+        const yesBtn = document.getElementById('confirmYes');
+        const noBtn = document.getElementById('confirmNo');
+
+        if (!modal) {
+            // HTML ထဲမှာ customConfirm modal မရှိသေးရင် မူရင်း confirm ကို ယာယီသုံးမယ် (Error မတက်အောင်)
+            if (confirm(message)) {
+                if (onYes) onYes();
+            }
+            return;
+        }
+
+        msgEl.innerText = message;
+        modal.style.display = 'flex';
+
+        // Event listener တွေ ထပ်မသွားအောင် clone လုပ်ပြီး အစားထိုးခြင်း
+        const newYesBtn = yesBtn.cloneNode(true);
+        const newNoBtn = noBtn.cloneNode(true);
+        yesBtn.parentNode.replaceChild(newYesBtn, yesBtn);
+        noBtn.parentNode.replaceChild(newNoBtn, noBtn);
+
+        // Yes နှိပ်လျှင်
+        newYesBtn.onclick = () => {
+            modal.style.display = 'none';
+            if (onYes) onYes();
+        };
+
+        // No နှိပ်လျှင်
+        newNoBtn.onclick = () => {
+            modal.style.display = 'none';
+        };
+    }
+};
 
 </script>
   <div id="summaryModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:10000; justify-content:center; align-items:center;">
