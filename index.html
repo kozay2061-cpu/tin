@@ -2098,43 +2098,40 @@ function processInput() {
     if (!field.value.trim() || activeIndex === -1) return;
 
     let rawLines = field.value.split(/\r?\n/); 
-    
-    let added = false;
     const WARNING_LIMIT = 30000; 
     let todayDate = new Date().toISOString().split('T')[0];
-
-        for (let rawLine of rawLines) {
+    window._hasDuplicateError = false; 
+  
+    for (let rawLine of rawLines) {
         if (!rawLine.trim()) continue;
 
         let line = uniToEng(rawLine.toLowerCase());
 
-        // ✅ အဓိက ပြင်ဆင်ချက်: ထိပ်, နောက်, ထိပ်နောက်, r (အသွားအပြန်) ရှေ့က ဂဏန်းများကြား space များကို အလိုအလျောက် ပေါင်းပေးခြင်း
+        // ထိပ်, နောက်, ထိပ်နောက်, r (အသွားအပြန်) ရှေ့က ဂဏန်းများကြား space များကို အလိုအလျောက် ပေါင်းပေးခြင်း
         line = line.replace(/(\d+)(?:\s+(\d+))+(?=\s*(?:h|t|th|ht|ထိပ်|နောက်|ထိပ်နောက်))/gi, function(match) {
             return match.replace(/\s+/g, '');
         });
-
-        // 🔥 [ဒီနေရာမှာ အရင်ဆုံး ထားရပါမယ်] 'ည' မဖျက်ခင် bro အရင်ပြောင်းပါ 🔥
-        line = line.replace(/(\d+)\s*ခွေ\s*(\d+)\s*(?:အ)?ပူး(?:ပါ)?/g, '$1 kp $2');
-        line = line.replace(/kအပူးပါ|အပူးပါခွေ|ခွေအပူးပါ|ခွေp|ခွေa|ခွေပူး|ခပ|ka/g, 'kp'); 
+        // 🛠️ "123 ခွေ 1000အပူးပါ" နှင့် "123456 ခွေ 1000ပူးပါ" ပုံစံများကို kp သို့ ပြောင်းလဲခြင်း
+        line = line.replace(/(\d+)\s*ခွေ\s*(\d+)\s*(?:အပူးပါ|ပူးပါ|အပူး|ပူး)/gi, '$1 kp $2');
+        if (line.includes('ခွေပူး') || line.includes('ခွေ ပူး') || line.includes('ခွေအပူးပါ') || line.includes('အပူးပါခွေ')) {
+            line = line.replace(/(\d+)\s*(?:ခွေပူး|ခွေ\s*ပူး|အပူးပါခွေ|အပူးပါ\s*ခွေ|ခွေအပူးပါ|ခွေ\s*အပူးပါ|ခွေp|ခွေa|ခပ)\s*(\d+)/gi, '$1 kp $2');
+        }
+        line = line.replace(/(\d+)\s*(?:ခွေပူး|ခွေ\s*ပူး|အပူးပါခွေ|အပူးပါ\s*ခွေ|ခွေအပူးပါ|ခွေ\s*အပူးပါ|ခွေp|ခွေa|ခပ|ka)\s*(\d+)/gi, '$1 kp $2');
+        line = line.replace(/(?:ခွေပူး|ခွေ\s*ပူး|အပူးပါခွေ|အပူးပါ\s*ခွေ|ခွေအပူးပါ|ခွေ\s*အပူးပါ|ခွေp|ခွေa|ခပ|ka)/gi, 'kp');
         line = line.replace(/ညီအစ်ကို|ညီအကို|ညီကို|ညက|bro|br/g, 'bro');
+
         line = line.replace(/ပါဝါ|ပဝ|power/g, 'pw');
         line = line.replace(/အပါ|ပတ်သီး|ပါတ်|ပတ်|ပါ/g, 'p');
-
           
-        // ပြီးမှ အောက်က ဟာတွေ ဆက်လုပ်ပါ
         line = line.replace(/ဆရာ|ဦး|ဒေါ်|ဗျာ|ခင်ဗျာ|ရှင့်|နော်|ok|help|plz|hi|hello|mingalarpar/g, ' ');
         line = line.replace(/မနက်|ညနေ|နေ့လည်|နံ|နံက်|ည|morning|evening|am|pm/g, ' ');
-
         line = line.replace(/ကျေးဇူး|တင်ပါတယ်|ရလား|ရမလား|လုပ်ပေးပါ|ထိုးမယ်|ပို|ဆို|ထဲက|သီးသန့်|အပြီး|စီး/g, ' ');
         line = line.replace(/ဒဲ့(?!ကပ်|k)/g, ' '); 
         line = line.replace(/တည့်/g, ' ');
         line = line.replace(/[=\/\*\-\.\+]/g, ' '); 
         line = line.replace(/ပတ်ရှင်း|ဒေးလီး|အပတ်ရှင်း|အပါတ်ရှင်း/g, ' ');
 
-        // 🛑 [အရေးကြီး] စကားလုံးအရှည်တွေကို အရင် Replace လုပ်ပါ 🛑
         line = line.replace(/နတ္ခတ်|နက္ခတ်|နခ|နတ်ခက်|နက်ခတ်|နက်ခက်|နတ်ခတ်/g, 'nk');
-
-        // (bro လိုင်းကို အပေါ်တင်လိုက်ပြီဖြစ်လို့ ဒီနေရာမှာ မရှိတော့ပါ)
         line = line.replace(/စုံထိပ်|စထ/g, 'sh')
               .replace(/မထိပ်|မထ/g, 'mh')
               .replace(/စုံနောက်|စန/g, 'st')
@@ -2143,7 +2140,6 @@ function processInput() {
               .replace(/ဒဲ့ကပ်|ကပ်/g, 'dk')
               .replace(/ထိပ်စီး|ထိပ်|ထ/g, 'h');
 
-        // 🛑 ပြီးမှ စာလုံးအတိုတွေကို နောက်မှ Replace လုပ်ပါ 🛑
         line = line.replace(/ခွေ\s*(.*?)\s*အပူး(?:ပါ)?/g, 'kp $1');
         line = line.replace(/အပါ|ပတ်သီး|ပါတ်|ပတ်|ပါ/g, 'p'); 
         line = line.replace(/ခွေ|ခ/g, 'k').replace(/စုံစုံ/g, 'ss');
@@ -2152,187 +2148,179 @@ function processInput() {
         line = line.replace(/မမ/g, 'mm').replace(/စုံမ|စမ/g, 'sm');
         line = line.replace(/မစုံ|မစ/g, 'ms')
               .replace(/ကြီးကြီး/g, 'kk').replace(/ငယ်ငယ်|သေး/g, 'nn')
-             .replace(/ကြီးငယ်|ကြီးသေး/g, 'kn')
-             .replace(/ငယ်ကြီး|သေးကြီး/g, 'ng');
+              .replace(/ကြီးငယ်|ကြီးသေး/g, 'kn')
+              .replace(/ငယ်ကြီး|သေးကြီး/g, 'ng');
 
         line = line.replace(/nk/g, 'NK').replace(/kn/g, 'KN').replace(/ng/g, 'NG').replace(/nn/g, 'NN');
         line = line.replace(/နောက်ပိတ်|ပိတ်|နောက်|ပ|န|n/g, 't');
-        line = line.replace(/ဘရိတ်|ဘရ|ဘ|break|bk/g, 'b')
-             .replace(/[။၊]/g, ' '); 
-             
-        // ... (အောက်ပိုင်းက အတူတူပဲ ဆက်သွားပါမည်) ...
-
+        line = line.replace(/ဘရိတ်|ဘရ|ဘ|break|bk/g, 'b').replace(/[။၊]/g, ' '); 
 
         let trim = line.trim();
         if (!trim) continue;
         trim = trim.replace(/,/g, ' ');
 
+        // 📝 စာရင်း တကယ်ထည့်မည့် Function (Helper Function)
+        const executeLineAddition = () => {
+            let id = Date.now() + Math.random(); 
+            let matches = [];
+            
+            let singleHtMatch = trim.match(/^(\d+)\s*(?:ht|th|ထိပ်နောက်)\s*(\d+)$/i);
+            let htMatch = trim.match(/^(\d+)\s*h\s*(\d+)\s*(?:t|n|နောက်)\s*(\d+)$/i);
+            let hrMatch = trim.match(/^(\d+)\s*h\s*(\d+)\s*(?:r|အာ)\s*(\d+)$/i);
+          
+            if (singleHtMatch) {
+                let digitStr = singleHtMatch[1];
+                let amt = parseInt(singleHtMatch[2]);
+                let digits = digitStr.split('');
+                
+                digits.forEach(d => {
+                    for (let i = 0; i < 100; i++) {
+                        let numStr = i.toString().padStart(2, '0');
+                        let isHead = numStr.startsWith(d);
+                        let isRear = numStr.endsWith(d);
+                        
+                        if (isHead && isRear) {
+                            matches.push({ num: numStr, amt: amt * 2 });
+                        } else if (isHead || isRear) {
+                            matches.push({ num: numStr, amt: amt });
+                        }
+                    }
+                });
+            }
+            else if (htMatch || hrMatch) {
+                let match = htMatch || hrMatch;
+                let digitStr = match[1];       
+                let hAmt = parseInt(match[2]);  
+                let secondAmt = parseInt(match[3]); 
+                let digits = digitStr.split(''); 
+                
+                digits.forEach(d => {
+                    for (let i = 0; i < 100; i++) {
+                        let numStr = i.toString().padStart(2, '0'); 
+                        let isHead = numStr.startsWith(d); 
+                        let isRear = numStr.endsWith(d);    
+                        
+                        if (isHead && isRear) {
+                            matches.push({ num: numStr, amt: hAmt + secondAmt });
+                        } else {
+                            if (isHead) matches.push({ num: numStr, amt: hAmt });
+                            if (isRear) matches.push({ num: numStr, amt: secondAmt });
+                        }
+                    }
+                });
+            }
+            else { 
+                let dkMatch = trim.match(/^(\d+)\s*dk\s*(\d+)\s*[\s,]+(\d+)(?:\s*(?:r|အာ)\s*(\d+))?/i);
+                if (dkMatch) {
+                    let fStr = dkMatch[1]; let bStr = dkMatch[2]; let mAmt = parseInt(dkMatch[3]); let rAmt = dkMatch[4] ? parseInt(dkMatch[4]) : 0; 
+                    fStr.split('').forEach(f => { bStr.split('').forEach(b => { matches.push({ num: f + b, amt: mAmt }); }); });
+                    if (rAmt > 0) { 
+                        bStr.split('').forEach(b => { fStr.split('').forEach(f => { matches.push({ num: b + f, amt: rAmt }); }); }); 
+                    }
+                }
+                else {
+                    let hasShortcut = /[a-z\u1000-\u109f]+/i.test(trim); 
+                    let isR = /r|အာ/i.test(trim) && !/bro/i.test(trim);
+
+                    if (hasShortcut && !isR) { 
+                        processStandardCommands(trim, matches); 
+                    } 
+                    else {
+                        let sA = 0, rA = 0, nums = [];
+                        if (isR) {
+                            let parts = trim.split(/r|အာ/i); let leftPart = parts[0].trim(); let rightPart = parts[1] ? parts[1].trim() : "";
+                            let leftParts = leftPart.split(/[^0-9]+/).filter(x => x); let rightParts = rightPart.split(/[^0-9]+/).filter(x => x);
+                            
+                            if (rightParts.length >= 2) { sA = parseInt(rightParts[0]); rA = parseInt(rightParts[1]); nums = leftParts; } 
+                            else if (rightParts.length === 1) {
+                                rA = parseInt(rightParts[0]); let lastItem = leftParts.length > 0 ? leftParts[leftParts.length - 1] : "0";
+                                let potAmt = parseInt(lastItem); let isAmount = false;
+                                if (leftParts.length > 1 && potAmt >= 100) { if (lastItem.endsWith("00") || lastItem.length === 3) isAmount = true; }
+                                if (isAmount) { sA = parseInt(leftParts.pop()); } else { sA = rA; } nums = leftParts;
+                            } else if (leftParts.length > 1 && rightParts.length === 0) { sA = parseInt(leftParts.pop()); rA = sA; nums = leftParts; } else { nums = leftParts; }
+                            
+                            let expandedNums = [];
+                            nums.forEach(n => { if (n.length >= 4 && n.length % 2 === 0) { for (let k = 0; k < n.length; k += 2) expandedNums.push(n.substring(k, k + 2)); } else { expandedNums.push(n); } });
+                            
+                            expandedNums.forEach(n => { 
+                                let fN = n.padStart(2, '0'); if (fN.length !== 2) return; 
+                                let revN = fN[1] + fN[0];
+                                if (fN === revN) { 
+                                    let finalAmt = (typeof settings !== 'undefined' && settings.doublePair) ? (sA + rA) : sA; 
+                                    matches.push({ num: fN, amt: finalAmt }); 
+                                } else { 
+                                    if (sA > 0) matches.push({ num: fN, amt: sA }); 
+                                    if (rA > 0) matches.push({ num: revN, amt: rA }); 
+                                } 
+                            });
+                        } else {
+                            let parts = trim.split(/\s+/).filter(x => /^\d+$/.test(x)); 
+                            if (parts.length > 1) { 
+                                let amt = parseInt(parts.pop()); 
+                                let tempNums = []; 
+                                parts.forEach(p => { 
+                                    if (p.length >= 4 && p.length % 2 === 0) { 
+                                        for(let k=0; k<p.length; k+=2) tempNums.push(p.substring(k, k+2)); 
+                                    } else { tempNums.push(p); } 
+                                }); 
+                                tempNums.forEach(n => { 
+                                    let fN = n.padStart(2, '0'); 
+                                    if (fN.length === 2) matches.push({ num: fN, amt: amt }); 
+                                }); 
+                            }
+                        }
+                    }
+                }
+            } 
+
+            if (matches.length > 0) {
+                let bigAmountItem = matches.find(m => m.amt >= WARNING_LIMIT);
+                let allowAdd = true; 
+                if (bigAmountItem) {
+                    allowAdd = confirm(`⚠️ သတိပေးချက်!\n\nသွင်းငွေပမာဏ (${bigAmountItem.amt}) သည် သတ်မှတ်ချက် (${WARNING_LIMIT}) ထက် များနေပါသည်။\n\nဆက်သွင်းမှာ သေချာပါသလား?`);
+                }
+                if (allowAdd) {
+                    matches.forEach(m => {
+                        customers[activeIndex].data.push({ 
+                            id: id, 
+                            num: m.num, 
+                            amt: m.amt, 
+                            date: todayDate 
+                        });
+                    }); 
+                    
+                    customers[activeIndex].history.push({ 
+                        id: id, 
+                        text: trim,
+                        date: todayDate
+                    }); 
+                    
+                    saveToStorage(); 
+                    renderAll(); 
+                }
+            }
+        };
+
+        // 🔍 စာရင်းထပ်နေခြင်း ရှိမရှိ စစ်ဆေးခြင်း
         if (customers[activeIndex] && customers[activeIndex].history) {
             let isAlreadyEntered = customers[activeIndex].history.some(h => h.text === trim && h.date === todayDate);
             
             if (isAlreadyEntered) {
-                // ဝင်ပြီးသားဖြစ်နေရင် Alert ပြပါမည်
-                let wantToAddAgain = CustomConfirm.show(`⚠️ သတိပေးချက် (စာရင်းထပ်နေပါသည်)\n\n"${rawLine}" ကို ဒီနေ့စာရင်းထဲမှာ ထည့်သွင်းပြီးဖြစ်နေပါသည်။\n\nတကယ်ပဲ နောက်တစ်ခေါက် ထပ်ထည့်မှာ သေချာပါသလား?`);
-                
-                if (!wantToAddAgain) {
-                    continue; // Cancel နှိပ်ရင် ဒီစာကြောင်းကို မတွက်တော့ဘဲ ကျော်သွားပါမည်
-                }
+                // "သေချာသည်" ကို နှိပ်မှသာ executeLineAddition() ကို ခေါ်ပေးမည်
+                CustomConfirm.show(`⚠️ သတိပေးချက် (စာရင်းထပ်နေပါသည်)\n\n"${rawLine}" ကို ဒီနေ့စာရင်းထဲမှာ ထည့်သွင်းပြီးဖြစ်နေပါသည်။\n\nတကယ်ပဲ နောက်တစ်ခေါက် ထပ်ထည့်မှာ သေချာပါသလား?`, () => {
+                    executeLineAddition();
+                });
+                continue; // Modal ပေါ်နေစဉ် ဆက်မသွားစေရန် ခေတ္တရပ်ထားမည်
             }
         }
-        // 🔥🔥🔥 Duplicate Check ပြီးပါပြီ 🔥🔥🔥
 
-        let id = Date.now() + Math.random(); 
-        let matches = [];
-        
-        // (၁) ထိပ် + နောက် (သို့မဟုတ်) Single HT / HR များကို စစ်ဆေးခြင်း
-        let singleHtMatch = trim.match(/^(\d+)\s*(?:ht|th|ထိပ်နောက်)\s*(\d+)$/i);
-let htMatch = trim.match(/^(\d+)\s*h\s*(\d+)\s*(?:t|n|နောက်)\s*(\d+)$/i);
-let hrMatch = trim.match(/^(\d+)\s*h\s*(\d+)\s*(?:r|အာ)\s*(\d+)$/i);
-      
-        
-        if (singleHtMatch) {
-            let digitStr = singleHtMatch[1];
-            let amt = parseInt(singleHtMatch[2]);
-            let digits = digitStr.split('');
-            
-            digits.forEach(d => {
-                for (let i = 0; i < 100; i++) {
-                    let numStr = i.toString().padStart(2, '0');
-                    let isHead = numStr.startsWith(d);
-                    let isRear = numStr.endsWith(d);
-                    
-                    if (isHead && isRear) {
-                        matches.push({ num: numStr, amt: amt * 2 });
-                    } else if (isHead || isRear) {
-                        matches.push({ num: numStr, amt: amt });
-                    }
-                }
-            });
-        }
-        else if (htMatch || hrMatch) {
-            let match = htMatch || hrMatch;
-            let digitStr = match[1];       
-            let hAmt = parseInt(match[2]);  
-            let secondAmt = parseInt(match[3]); 
-            let digits = digitStr.split(''); 
-            
-            digits.forEach(d => {
-                for (let i = 0; i < 100; i++) {
-                    let numStr = i.toString().padStart(2, '0'); 
-                    let isHead = numStr.startsWith(d); 
-                    let isRear = numStr.endsWith(d);    
-                    
-                    if (isHead && isRear) {
-                        matches.push({ num: numStr, amt: hAmt + secondAmt });
-                    } else {
-                        if (isHead) matches.push({ num: numStr, amt: hAmt });
-                        if (isRear) matches.push({ num: numStr, amt: secondAmt });
-                    }
-                }
-            });
-        }
-        else { 
-            let dkMatch = trim.match(/^(\d+)\s*dk\s*(\d+)\s*[\s,]+(\d+)(?:\s*(?:r|အာ)\s*(\d+))?/i);
-            if (dkMatch) {
-                let fStr = dkMatch[1]; let bStr = dkMatch[2]; let mAmt = parseInt(dkMatch[3]); let rAmt = dkMatch[4] ? parseInt(dkMatch[4]) : 0; 
-                fStr.split('').forEach(f => { bStr.split('').forEach(b => { matches.push({ num: f + b, amt: mAmt }); }); });
-                if (rAmt > 0) { 
-                    bStr.split('').forEach(b => { fStr.split('').forEach(f => { matches.push({ num: b + f, amt: rAmt }); }); }); 
-                }
-            }
-            else {
-                let hasShortcut = /[a-z\u1000-\u109f]+/i.test(trim); 
-                let isR = /r|အာ/i.test(trim) && !/bro/i.test(trim);
-
-                if (hasShortcut && !isR) { 
-                    processStandardCommands(trim, matches); 
-                } 
-                else {
-                    let sA = 0, rA = 0, nums = [];
-                    if (isR) {
-                        let parts = trim.split(/r|အာ/i); let leftPart = parts[0].trim(); let rightPart = parts[1] ? parts[1].trim() : "";
-                        let leftParts = leftPart.split(/[^0-9]+/).filter(x => x); let rightParts = rightPart.split(/[^0-9]+/).filter(x => x);
-                        
-                        if (rightParts.length >= 2) { sA = parseInt(rightParts[0]); rA = parseInt(rightParts[1]); nums = leftParts; } 
-                        else if (rightParts.length === 1) {
-                            rA = parseInt(rightParts[0]); let lastItem = leftParts.length > 0 ? leftParts[leftParts.length - 1] : "0";
-                            let potAmt = parseInt(lastItem); let isAmount = false;
-                            if (leftParts.length > 1 && potAmt >= 100) { if (lastItem.endsWith("00") || lastItem.length === 3) isAmount = true; }
-                            if (isAmount) { sA = parseInt(leftParts.pop()); } else { sA = rA; } nums = leftParts;
-                        } else if (leftParts.length > 1 && rightParts.length === 0) { sA = parseInt(leftParts.pop()); rA = sA; nums = leftParts; } else { nums = leftParts; }
-                        
-                        let expandedNums = [];
-                        nums.forEach(n => { if (n.length >= 4 && n.length % 2 === 0) { for (let k = 0; k < n.length; k += 2) expandedNums.push(n.substring(k, k + 2)); } else { expandedNums.push(n); } });
-                        
-                        expandedNums.forEach(n => { 
-                            let fN = n.padStart(2, '0'); if (fN.length !== 2) return; 
-                            let revN = fN[1] + fN[0];
-                            if (fN === revN) { 
-                                // 'settings' is assumed to be globally available
-                                let finalAmt = (typeof settings !== 'undefined' && settings.doublePair) ? (sA + rA) : sA; 
-                                matches.push({ num: fN, amt: finalAmt }); 
-                            } else { 
-                                if (sA > 0) matches.push({ num: fN, amt: sA }); 
-                                if (rA > 0) matches.push({ num: revN, amt: rA }); 
-                            } 
-                        });
-                    } else {
-                        let parts = trim.split(/\s+/).filter(x => /^\d+$/.test(x)); 
-                        if (parts.length > 1) { 
-                            let amt = parseInt(parts.pop()); 
-                            let tempNums = []; 
-                            parts.forEach(p => { 
-                                if (p.length >= 4 && p.length % 2 === 0) { 
-                                    for(let k=0; k<p.length; k+=2) tempNums.push(p.substring(k, k+2)); 
-                                } else { tempNums.push(p); } 
-                            }); 
-                            tempNums.forEach(n => { 
-                                let fN = n.padStart(2, '0'); 
-                                if (fN.length === 2) matches.push({ num: fN, amt: amt }); 
-                            }); 
-                        }
-                    }
-                }
-            }
-        } 
-
-        // 🛑 ပမာဏများရင် သတိပေးမည့်စနစ်
-        if (matches.length > 0) {
-            let bigAmountItem = matches.find(m => m.amt >= WARNING_LIMIT);
-            let allowAdd = true; 
-            if (bigAmountItem) {
-                allowAdd = confirm(`⚠️ သတိပေးချက်!\n\nသွင်းငွေပမာဏ (${bigAmountItem.amt}) သည် သတ်မှတ်ချက် (${WARNING_LIMIT}) ထက် များနေပါသည်။\n\nဆက်သွင်းမှာ သေချာပါသလား?`);
-            }
-            if (allowAdd) {
-                matches.forEach(m => {
-                    customers[activeIndex].data.push({ 
-                        id: id, 
-                        num: m.num, 
-                        amt: m.amt, 
-                        date: todayDate 
-                    });
-                }); 
-                
-                customers[activeIndex].history.push({ 
-                    id: id, 
-                    text: trim,
-                    date: todayDate
-                }); 
-                added = true;
-            }
-        }
+        // စာရင်းအသစ်ဆိုလျှင် တန်းထည့်မည်
+        executeLineAddition();
     } 
-
-    if (added) { 
-        // 'saveToStorage' and 'renderAll' are assumed to be globally available functions
-        if (typeof saveToStorage === 'function') saveToStorage(); 
-        try {
-            if (typeof renderAll === 'function') renderAll(); 
-        } catch (e) {
-            console.error("Render Error:", e); 
-        }
-        field.value = ""; 
-    }
+    if (window._hasDuplicateError) {
+        return; 
+  }
+    field.value = ""; 
 }
 function processStandardCommands(line, matches) {
     // English Shortcut များ
@@ -2342,6 +2330,7 @@ function processStandardCommands(line, matches) {
         'nk': ["07","70","18","81","69","96","35","53","42","24"], 
         'bro': ["01","10","12","21","23","32","34","43","45","54","56","65","67","76","78","87","89","98","09","90"] 
     };
+    
     // Myanmar Shortcut Mapping
     const MM_MAP = {
         'နတ္ခတ်': 'nk', 'နက္ခတ်': 'nk', 'နတ္ခက်': 'nk',  'နက္ခက်': 'nk', 'နက်ခတ်': 'nk', 'နက်ခက်': 'nk', 'နခ': 'nk', 'နတ်ခတ်': 'nk', 'နတ်ခက်': 'nk', 
@@ -2361,12 +2350,14 @@ function processStandardCommands(line, matches) {
         'စုံနောက်': 'st', 'စန': 'st',
         'မနောက်': 'mt', 'မန': 'mt'
     };
+
     const normalizeNum = (str) => { return str.replace(/[၀-၉]/g, d => "၀၁၂၃၄၅၆၇၈၉".indexOf(d)); };
     let cleanLine = normalizeNum(line).toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()၊။]+/g, " ").replace(/\s+/g, " "); 
     cleanLine = cleanLine.replace(/(\d)([a-z\u1000-\u109f])/g, "$1 $2"); cleanLine = cleanLine.replace(/([a-z\u1000-\u109f])(\d)/g, "$1 $2"); 
     let parts = cleanLine.split(/\s+/).filter(Boolean); 
     let globalNums = []; 
     const AL = ["0","1","2","3","4","5","6","7","8","9"];
+
     const addMatch = (num, amt) => { 
         if (!amt || amt <= 0) return; 
         let nStr = String(num); 
@@ -2374,13 +2365,14 @@ function processStandardCommands(line, matches) {
         if (existing) { existing.amt = Number(existing.amt) + Number(amt); } 
         else { matches.push({ num: nStr, amt: Number(amt) }); } 
     };
+
     let i = 0;
     while (i < parts.length) {
         let token = parts[i]; 
         let isNumber = /^\d+$/.test(token); 
         let isCommand = /^[a-z\u1000-\u109f]+$/.test(token); 
+
         if (isNumber) { 
-            // 🔥 ပြင်ဆင်ချက် (၁): = နဲ့ အစားမထိုးဘဲ push နဲ့ ထပ်ထည့်ပါတယ်
             globalNums.push(...token.split('')); 
             i++; 
         } 
@@ -2388,31 +2380,59 @@ function processStandardCommands(line, matches) {
             let cmd = token; 
             if (MM_MAP[cmd]) { cmd = MM_MAP[cmd]; }
             let amt = 0; 
-            if (i + 1 < parts.length && /^\d+$/.test(parts[i+1])) { amt = parseInt(parts[i+1]); i += 2; } else { i++; }
-                        if (['h', 't', 'n', 'p', 'k', 'b', 'kp', 'ht', 'th', 'dk', 'ထိပ်', 'နောက်', 'ထိပ်နောက်', 'ဒဲ့ကပ်', 'ခွေ', 'ပတ်'].includes(cmd)) {
+
+            if (i + 1 < parts.length && /^\d+$/.test(parts[i+1])) { 
+                amt = parseInt(parts[i+1]); 
+                i += 2; 
+            } else { 
+                i++; 
+            }
+
+            if (['h', 't', 'n', 'p', 'k', 'b', 'kp', 'ht', 'th', 'dk', 'ထိပ်', 'နောက်', 'ထိပ်နောက်', 'ဒဲ့ကပ်', 'ခွေ', 'ပတ်'].includes(cmd)) {
                  if (globalNums.length > 0 && amt > 0) {
                     
-                    // 🔥 ဤနေရာတွင် ထည့်ပါ (ကုဒ်အဟောင်းများ မပျက်စေဘဲ ဤနေရာကနေ စစ်ပေးပါမည်)
-                    if (['k', 'kp', 'ခွေ'].includes(cmd)) {
-                        let hasDuplicate = globalNums.some((val, idx, arr) => arr.indexOf(val) !== idx);
-                        if (hasDuplicate) {
-                            CustomConfirm.show("⚠️ အမှား: ထည့်သွင်းထားသော ခွေဂဏန်းထဲတွင် ဂဏန်းနှစ်ခါထပ်နေပါသည် (ဥပမာ - " + globalNums.join('') + ")။ ဤစာရင်းကို ထည့်သွင်း၍မရပါ။", () => {});
-                            return; 
-                        }
-                    }
-
-                    // -------------------------------------------------------------
-
                     if (cmd === 'h' || cmd === 'ထိပ်') globalNums.forEach(n => AL.forEach(x => addMatch(n + x, amt)));
                     else if (cmd === 't' || cmd === 'n' || cmd === 'နောက်') globalNums.forEach(n => AL.forEach(x => addMatch(x + n, amt)));
                     else if (cmd === 'ht' || cmd === 'th' || cmd === 'ထိပ်နောက်') globalNums.forEach(n => { AL.forEach(x => addMatch(x + n, amt)); AL.forEach(x => addMatch(x + n, amt)); });
                     else if (cmd === 'p' || cmd === 'ပတ်') globalNums.forEach(n => AL.forEach(x => { addMatch(n + x, amt); if (n !== x) addMatch(x + n, amt); }));
-                    else if (cmd === 'k' || cmd === 'kp' || cmd === 'ခွေ') { for (let a = 0; a < globalNums.length; a++) { for (let b = 0; b < globalNums.length; b++) { if (a === b) continue; addMatch(globalNums[a] + globalNums[b], amt); } } if (cmd === 'kp') globalNums.forEach(d => addMatch(d + d, amt)); } 
-                    else if (cmd === 'dk' || cmd === 'ဒဲ့ကပ်') { for (let a = 0; a < globalNums.length; a++) { for (let b = a + 1; b < globalNums.length; b++) { addMatch(globalNums[a] + globalNums[b], amt); } } }
-                    else if (cmd === 'b') { globalNums.forEach(b => { for(let x=0; x<100; x++) { let nStr = x.toString().padStart(2, '0'); if ((parseInt(nStr[0]) + parseInt(nStr[1])) % 10 == parseInt(b)) addMatch(nStr, amt); } }); }
+                    
+                        else if (cmd === 'k' || cmd === 'kp' || cmd === 'ခွေ') { 
+    // 🔥 ခွေဂဏန်းများတွင် ဂဏန်းထပ်နေပါက CustomConfirm ဖြင့် သတိပေးခြင်း
+    let uniqueNums = new Set(globalNums);
+    if (uniqueNums.size !== globalNums.length) {
+        CustomConfirm.show(`⚠️ ခွေဂဏန်းတွင် ဂဏန်းထပ်နေပါသည် (${globalNums.join('')})။ ကျေးဇူးပြု၍ စာသားကို ကိုယ်တိုင်ပြင်ဆင်ပြီးမှ ပြန်ထည့်ပါ။`, () => {});
+        window._hasDuplicateError = true; // 👈 Input Box မပျက်ဘဲ ဆက်ရှိနေစေရန်
+        return;
+    }
+
+    for (let a = 0; a < globalNums.length; a++) { 
+        for (let b = 0; b < globalNums.length; b++) { 
+            if (a === b) continue; 
+            addMatch(globalNums[a] + globalNums[b], amt); 
+        } 
+    } 
+    if (cmd === 'kp') {
+        globalNums.forEach(d => addMatch(d + d, amt)); 
+    }
+}
+
+                    else if (cmd === 'dk' || cmd === 'ဒဲ့ကပ်') { 
+                        for (let a = 0; a < globalNums.length; a++) { 
+                            for (let b = a + 1; b < globalNums.length; b++) { 
+                                addMatch(globalNums[a] + globalNums[b], amt); 
+                            } 
+                        } 
+                    }
+                    else if (cmd === 'b') { 
+                        globalNums.forEach(b => { 
+                            for(let x=0; x<100; x++) { 
+                                let nStr = x.toString().padStart(2, '0'); 
+                                if ((parseInt(nStr[0]) + parseInt(nStr[1])) % 10 == parseInt(b)) addMatch(nStr, amt); 
+                            } 
+                        }); 
+                    }
                 }
             }
-
             else if (amt > 0) {
                 if (SHORTCUT_LISTS[cmd]) { SHORTCUT_LISTS[cmd].forEach(n => addMatch(n, amt)); }
                 else if (cmd === 'mm') AL.forEach(a => AL.forEach(b => ["1","3","5","7","9"].includes(a) && ["1","3","5","7","9"].includes(b) && addMatch(a+b, amt)));
@@ -2428,12 +2448,14 @@ function processStandardCommands(line, matches) {
                 else if (cmd === 'st') AL.forEach(a => AL.forEach(b => ["0","2","4","6","8"].includes(b) && addMatch(a+b, amt)));
                 else if (cmd === 'mt') AL.forEach(a => AL.forEach(b => ["1","3","5","7","9"].includes(b) && addMatch(a+b, amt)));
             }
-            // 🔥 ပြင်ဆင်ချက် (၂): Command တစ်ခုလုပ်ပြီးတိုင်း ရှေ့ကမှတ်ထားတဲ့ ဂဏန်းတွေကို ပြန်ရှင်းပေးရပါမယ်
-            // ဒါမှ နောက်ထပ် ဂဏန်းအသစ်တွေကို သန့်သန့်ရှင်းရှင်း လက်ခံနိုင်မှာပါ
+
             globalNums = []; 
-        } else { i++; }
+        } else { 
+            i++; 
+        }
     }
 }
+
   function toggleSidebar() { 
       $('sidebar').classList.toggle('active'); $('overlay').classList.toggle('active'); }
   function saveWinNum() { 
@@ -4466,6 +4488,8 @@ function copySplitOverLimitText2() {
 }
 // Custom Confirmation Helper Object
 // Custom Confirmation Helper Object (Updated)
+// Custom Confirmation Helper Object (Updated Fix)
+// Custom Confirmation Helper Object (Fixed for Mobile & PC)
 const CustomConfirm = {
     show(message, onYes) {
         const modal = document.getElementById('customConfirm');
@@ -4474,7 +4498,6 @@ const CustomConfirm = {
         const noBtn = document.getElementById('confirmNo');
 
         if (!modal) {
-            // HTML ထဲမှာ customConfirm modal မရှိသေးရင် မူရင်း confirm ကို ယာယီသုံးမယ် (Error မတက်အောင်)
             if (confirm(message)) {
                 if (onYes) onYes();
             }
@@ -4483,26 +4506,26 @@ const CustomConfirm = {
 
         msgEl.innerText = message;
         modal.style.display = 'flex';
+        modal.style.zIndex = '999999'; // အပေါ်ဆုံးသို့ ရောက်စေရန်
 
-        // Event listener တွေ ထပ်မသွားအောင် clone လုပ်ပြီး အစားထိုးခြင်း
-        const newYesBtn = yesBtn.cloneNode(true);
-        const newNoBtn = noBtn.cloneNode(true);
-        yesBtn.parentNode.replaceChild(newYesBtn, yesBtn);
-        noBtn.parentNode.replaceChild(newNoBtn, noBtn);
+        // ခလုတ်ဟောင်းများ၏ လုပ်ဆောင်ချက်များကို ရှင်းလင်းခြင်း
+        yesBtn.onclick = null;
+        noBtn.onclick = null;
 
-        // Yes နှိပ်လျှင်
-        newYesBtn.onclick = () => {
+        // သေချာသည် (Yes) နှိပ်သည့်အခါ
+        yesBtn.onclick = function() {
             modal.style.display = 'none';
-            if (onYes) onYes();
+            if (typeof onYes === 'function') {
+                onYes();
+            }
         };
 
-        // No နှိပ်လျှင်
-        newNoBtn.onclick = () => {
+        // မလုပ်ပါ (No) နှိပ်သည့်အခါ
+        noBtn.onclick = function() {
             modal.style.display = 'none';
         };
     }
 };
-
 </script>
   <div id="summaryModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:10000; justify-content:center; align-items:center;">
     
