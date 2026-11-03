@@ -1051,6 +1051,22 @@ function clearHistoryLog() {
     </div>
 </div>
 <script>
+// alert() ခေါ်တိုင်း CustomConfirm သို့မဟုတ် အခြား Popup မပေါ်ဘဲ This page says လုံးဝကင်းစင်စေရန်
+window.alert = function(message) {
+    if (typeof CustomConfirm !== 'undefined') {
+        CustomConfirm.show(message, () => {});
+    } else {
+        console.log("Alert: " + message);
+    }
+};
+
+// confirm() ကိုပါ Override လုပ်ထားချင်ရင် (Optional)
+window.confirm = function(message) {
+    // လိုအပ်ပါက CustomConfirm သို့မဟုတ် True ပေးရန်
+    return window.confirm(message);
+};
+
+
 // =========================================
 // ⛔ ONLINE BAN SYSTEM (Updated)
 // =========================================
@@ -1631,9 +1647,32 @@ if (!settings.customLimits) settings.customLimits = {};
     if(modal) modal.style.display = 'flex';
 }
   function copyToClipboard(t) {
-        if (!t) return alert("ကူးယူစရာ စာရင်းမရှိပါ"); let e = document.createElement('textarea'); e.value = t; e.style.fontSize = '12pt'; e.style.border = '0'; e.style.padding = '0'; e.style.margin = '0'; e.style.position = 'fixed'; e.style.left = '-9999px'; e.style.top = '0px'; document.body.appendChild(e); e.focus(); e.select(); e.setSelectionRange(0, 99999); 
-        try { let successful = document.execCommand('copy'); if(successful) alert("Copied!"); else alert("Copy failed"); } catch (err) { alert("Error copying text"); } document.body.removeChild(e);
+    if (!t) {
+        CustomConfirm.show("ကူးယူစရာ စာရင်းမရှိပါ", () => {});
+        return; 
     }
+    let e = document.createElement('textarea'); 
+    e.value = t; 
+    e.style.fontSize = '12pt'; e.style.border = '0'; e.style.padding = '0'; e.style.margin = '0'; e.style.position = 'fixed'; e.style.left = '-9999px'; e.style.top = '0px'; 
+    document.body.appendChild(e); 
+    e.focus(); 
+    e.select(); 
+    e.setSelectionRange(0, 99999); 
+    
+    try { 
+        let successful = document.execCommand('copy'); 
+        if(successful) {
+            // Copied လို့ alert မပြတော့ဘဲ လိုချင်ရင် CustomConfirm သုံးနိုင်ပါတယ် (သို့မဟုတ် မပေါ်ချင်ရင် ဒီအတိုင်းထားနိုင်ပါတယ်)
+            CustomConfirm.show("✅ အောင်မြင်စွာ Copy ကူးပြီးပါပြီ။", () => {});
+        } else {
+            CustomConfirm.show("⚠️ Copy ကူး၍ မရပါ။", () => {});
+        } 
+    } catch (err) { 
+        CustomConfirm.show("❌ Error copying text", () => {});
+    } 
+    document.body.removeChild(e);
+}
+
     // --- Archive System (ဖုန်းထဲတွင် သိမ်းဆည်းခြင်း စနစ်) 
   function saveCurrentSession() {
         if (!customers.some(c => c.data.length > 0)) { alert("သိမ်းစရာ စာရင်းမရှိပါ"); return; }
@@ -1870,7 +1909,7 @@ function copyOverLimitText() {
         
         copyToClipboard(finalText);
         let sortMsg = (currentSort === 'max') ? " (Max Sort)" : (currentSort === 'min' ? " (Min Sort)" : "");
-        alert("✅ အတင်စာရင်းကို" + sortMsg + " Copy ကူးပြီးပါပြီ!");
+        CustomConfirm.show("✅ အတင်စာရင်းကို" + sortMsg + " Copy ကူးပြီးပါပြီ!", () => {});
     } else {
         alert("⚠️ အတင်မရှိပါ (No Export)");
     }
@@ -1884,7 +1923,7 @@ function copyOverLimitTextR() {
     let { exportData, currentSort } = getExportDataList();
     
     if (exportData.length === 0) {
-        alert("⚠️ အတင်မရှိပါ (No Export)");
+        CustomConfirm.show("⚠️ အတင်မရှိပါ (No Export)");
         return;
     }
 
@@ -1928,14 +1967,14 @@ function copyOverLimitTextR() {
                     `\n----------\nTotal: ${total.toLocaleString()}`;
     
     copyToClipboard(finalText);
-    alert("✅ အတင်စာရင်း (R ပုံစံ) Copy ကူးပြီးပါပြီ!");
+    CustomConfirm.show("✅ အတင်စာရင်း (R ပုံစံ) Copy ကူးပြီးပါပြီ!");
 }
 
 function copySplitOverLimitText() {
     let { exportData, currentSort } = getExportDataList();
     
     if (exportData.length === 0) {
-        alert("⚠️ အတင်မရှိပါ (No Export)");
+        CustomConfirm.show("⚠️ အတင်မရှိပါ (No Export)");
         return;
     }
 
@@ -2051,7 +2090,7 @@ function copySplitOverLimitText() {
                     `\n----------\nTotal: ${total2.toLocaleString()}`;
     
     copyToClipboard(finalText);
-    alert("✅ Split စာရင်းကို အပိုင်း (၁) နှင့် (၂) အဖြစ် R ပုံစံဖြင့် Copy ကူးပြီးပါပြီ!");
+    CustomConfirm.show("✅ Split စာရင်းကို အပိုင်း (၁) နှင့် (၂) အဖြစ် R ပုံစံဖြင့် Copy ကူးပြီးပါပြီ!");
 }
 
 function processInput() {
@@ -2133,7 +2172,7 @@ function processInput() {
             
             if (isAlreadyEntered) {
                 // ဝင်ပြီးသားဖြစ်နေရင် Alert ပြပါမည်
-                let wantToAddAgain = confirm(`⚠️ သတိပေးချက် (စာရင်းထပ်နေပါသည်)\n\n"${rawLine}" ကို ဒီနေ့စာရင်းထဲမှာ ထည့်သွင်းပြီးဖြစ်နေပါသည်။\n\nတကယ်ပဲ နောက်တစ်ခေါက် ထပ်ထည့်မှာ သေချာပါသလား?`);
+                let wantToAddAgain = CustomConfirm.show(`⚠️ သတိပေးချက် (စာရင်းထပ်နေပါသည်)\n\n"${rawLine}" ကို ဒီနေ့စာရင်းထဲမှာ ထည့်သွင်းပြီးဖြစ်နေပါသည်။\n\nတကယ်ပဲ နောက်တစ်ခေါက် ထပ်ထည့်မှာ သေချာပါသလား?`);
                 
                 if (!wantToAddAgain) {
                     continue; // Cancel နှိပ်ရင် ဒီစာကြောင်းကို မတွက်တော့ဘဲ ကျော်သွားပါမည်
