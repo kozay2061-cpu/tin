@@ -295,60 +295,71 @@ body {
     font-weight: bold !important;
 }
 
-/* --- (၁) ကွန်ပျူတာ / ပုံမှန် စခရင်များအတွက် (ဘေးချင်းယှဉ် ၅၀% စီ) --- */
+/* =========================================================
+   ၁။ စခရင်ကြီး / ကွန်ပျူတာ / တက်ဘလက်အတွက် (အချိုးကျ ညီစေရန်)
+   ========================================================= */
 .main-wrapper { 
-    display: flex; 
-    align-items: stretch; 
-    gap: 8px; 
-    flex: 1; 
-    padding: 0 5px; 
-    box-sizing: border-box; 
-    overflow: hidden; 
+    display: flex !important; 
+    flex-direction: row !important; /* ဘယ်ညာ ဘေးချင်းယှဉ်မည် */
+    align-items: stretch !important; 
+    gap: 10px !important; 
+    flex: 1 !important; 
+    padding: 0 5px !important; 
+    box-sizing: border-box !important; 
+    overflow: hidden !important; 
 }
 
+/* ဘယ်ဘက် Win Column (နေရာ ၅၀% ယူမည်) */
 .left-panel { 
-    flex: 1; 
-    width: 50%; 
-    display: flex; 
-    flex-direction: column; 
-    background: white; 
-    border-radius: 8px; 
-    overflow: hidden; 
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
+    flex: 1 1 50% !important; 
+    width: 50% !important; 
+    min-width: 0 !important; /* Container ကျုံ့/ကား အဆင်ပြေစေရန် */
+    display: flex !important; 
+    flex-direction: column !important; 
+    background: white !important; 
+    border-radius: 8px !important; 
+    overflow: hidden !important; 
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important; 
 }
 
+/* ညာဘက် Sidebar - History + Customer (နေရာ ၅၀% ယူမည်) */
 .right-sidebar { 
-    flex: 1; 
-    width: 50%; 
-    display: flex; 
-    flex-direction: column; 
-    gap: 8px; 
-    height: 100%; 
+    flex: 1 1 50% !important; 
+    width: 50% !important; 
+    min-width: 0 !important; 
+    display: flex !important; 
+    flex-direction: column !important; 
+    gap: 8px !important; 
+    height: 100% !important; 
 }
 
+/* History Box */
 .log-container { 
     width: 100% !important; 
-    background: white; 
-    display: flex; 
-    flex-direction: column; 
-    border-radius: 8px; 
-    border: 1px solid #eee; 
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
+    background: white !important; 
+    display: flex !important; 
+    flex-direction: column !important; 
+    border-radius: 8px !important; 
+    border: 1px solid #eee !important; 
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important; 
     overflow: hidden !important; 
-    flex: 1;
-    min-height: 180px; 
+    flex: 1 !important;
+    min-height: 180px !important; 
 }
 
+/* Customer Box */
 .right-panel { 
     width: 100% !important; 
-    display: flex; 
-    flex-direction: column; 
-    gap: 8px; 
-    flex: 1; 
+    display: flex !important; 
+    flex-direction: column !important; 
+    gap: 8px !important; 
+    flex: 1 !important; 
 }
 
 
-/* --- (၂) ဖုန်းစခရင်ငယ်များအတွက် (အပေါ်အောက် အထပ်လိုက်ဖြစ်စေရန်) --- */
+/* =========================================================
+   ၂။ ဖုန်းစခရင်ငယ်များအတွက် (အပေါ်အောက် အထပ်လိုက် ပြောင်းမည်)
+   ========================================================= */
 @media only screen and (max-width: 760px) { 
     body, html, #mainApp {
         width: 100% !important;
@@ -360,7 +371,7 @@ body {
     
     .main-wrapper {
         display: flex !important;
-        flex-direction: column !important; /* 👈 ဖုန်းတွင် အပေါ်အောက် အထပ်လိုက်စီမည် */
+        flex-direction: column !important; /* ဖုန်းတွင် အပေါ်အောက် အထပ်လိုက်စီမည် */
         gap: 8px !important;
         padding: 0 5px !important;
         margin: 5px 0 0 0 !important;
@@ -369,7 +380,7 @@ body {
     }
 
     .left-panel {
-        width: 100% !important; /* 👈 ဖုန်းတွင် Win ဇယား အကျယ် ၁၀၀% ယူမည် */
+        width: 100% !important;
         flex: none !important;
         background: white !important;
         border-radius: 8px !important;
@@ -379,7 +390,7 @@ body {
     }
 
     .right-sidebar {
-        width: 100% !important; /* 👈 ဖုန်းတွင် ညာဘက်ခြမ်း အကျယ် ၁၀၀% ယူမည် */
+        width: 100% !important;
         flex: none !important;
         display: flex !important;
         flex-direction: column !important;
@@ -398,17 +409,6 @@ body {
     }
 
     .input-area { height: 120px !important; }
-    
-    .header + div {
-        display: flex !important;
-        flex-direction: column !important;
-    }
-    .header + div > div {
-        margin-bottom: 5px !important;
-        width: 100% !important;
-    }
-    
-    .sidebar { width: 85% !important; max-width: 350px !important; }
 }
 /* (၂) 600px အောက် (ဖုန်းအသေးများ) အတွက် ဇယားကွက် ပြင်ဆင်မှု */
 @media only screen and (max-width: 600px) {
