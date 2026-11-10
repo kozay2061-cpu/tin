@@ -2150,7 +2150,7 @@ function copySplitOverLimitText() {
     CustomConfirm.show("✅ Split စာရင်းကို အပိုင်း (၁) နှင့် (၂) အဖြစ် R ပုံစံဖြင့် Copy ကူးပြီးပါပြီ!");
 }
 
-function processInput() {
+  function processInput() {
     const field = $('rawInput'); 
     if (!field.value.trim() || activeIndex === -1) return;
 
@@ -2176,7 +2176,9 @@ function processInput() {
         line = line.replace(/(\d+)\s*(?:ခွေပူး|ခွေ\s*ပူး|အပူးပါခွေ|အပူးပါ\s*ခွေ|ခွေအပူးပါ|ခွေ\s*အပူးပါ|ခွေp|ခွေa|ခပ|ka)\s*(\d+)/gi, '$1 kp $2');
         line = line.replace(/(?:ခွေပူး|ခွေ\s*ပူး|အပူးပါခွေ|အပူးပါ\s*ခွေ|ခွေအပူးပါ|ခွေ\s*အပူးပါ|ခွေp|ခွေa|ခပ|ka)/gi, 'kp');
         line = line.replace(/ညီအစ်ကို|ညီအကို|ညီကို|ညက|bro|br/g, 'bro');
-
+      
+        line = line.replace(/အပူး၁၀ကွက်|အပူး10ကွက်|အပူးစုံ|အပူး|အပ|ပူး/g, 'ap');
+      
         line = line.replace(/ပါဝါ|ပဝ|power/g, 'pw');
         line = line.replace(/အပါ|ပတ်သီး|ပါတ်|ပတ်|ပါ/g, 'p');
           
@@ -2193,7 +2195,6 @@ function processInput() {
               .replace(/မထိပ်|မထ/g, 'mh')
               .replace(/စုံနောက်|စန/g, 'st')
               .replace(/မနောက်|မန/g, 'mt')
-              .replace(/အပူး၁၀ကွက်|အပူး10ကွက်|အပူး|အပ|ပူး/g, 'ap')
               .replace(/ဒဲ့ကပ်|ကပ်/g, 'dk')
               .replace(/ထိပ်စီး|ထိပ်|ထ/g, 'h');
 
@@ -2379,7 +2380,7 @@ function processInput() {
   }
     field.value = ""; 
 }
-function processStandardCommands(line, matches) {
+  function processStandardCommands(line, matches) {
     // English Shortcut များ
     const SHORTCUT_LISTS = { 
         'ap': ["00","11","22","33","44","55","66","77","88","99"], 
@@ -2393,7 +2394,7 @@ function processStandardCommands(line, matches) {
         'နတ္ခတ်': 'nk', 'နက္ခတ်': 'nk', 'နတ္ခက်': 'nk',  'နက္ခက်': 'nk', 'နက်ခတ်': 'nk', 'နက်ခက်': 'nk', 'နခ': 'nk', 'နတ်ခတ်': 'nk', 'နတ်ခက်': 'nk', 
         'ပါဝါ': 'pw', 'ပဝ': 'pw',
         'ညီအစ်ကို': 'bro', 'ညီကို': 'bro', 'ညီအကို': 'bro',
-        'အပူး': 'ap', 'အပ': 'ap', 'ပူး': 'ap',
+        'အပူး': 'ap', 'အပ': 'ap', 'ပူး': 'ap','အပူးစုံ': 'ap',
         'မမ': 'mm', 
         'စစ': 'ss', 'စုံစုံ': 'ss',
         'စမ': 'sm', 'စုံမ': 'sm',
